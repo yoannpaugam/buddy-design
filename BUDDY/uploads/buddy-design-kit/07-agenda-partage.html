@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Buddy — Agenda partagé</title>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --coral: #FF5C57;
+    --coral-light: #FFE8E7;
+    --coral-mid: #FFB3B1;
+    --night: #1A1A2E;
+    --warm-white: #F7F4F0;
+    --gray: #6B7280;
+    --gray-light: #E5E2DE;
+    --white: #FFFFFF;
+    --purple: #8B5CF6;
+    --purple-light: #EDE9FE;
+    --green: #22C55E;
+    --green-light: #DCFCE7;
+    --amber: #F59E0B;
+    --amber-light: #FEF3C7;
+  }
+
+  body {
+    background: #E8E4DF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    padding: 24px 16px;
+  }
+
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--warm-white);
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    background: var(--warm-white);
+    padding: 14px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-weight: 600; font-size: 15px; color: var(--night); }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+  .status-icons svg { width: 16px; height: 16px; fill: var(--night); }
+
+  /* Header */
+  .header {
+    padding: 14px 24px 16px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--gray-light);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .back-btn svg { width: 20px; height: 20px; color: var(--night); }
+  .page-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 19px;
+    color: var(--night);
+  }
+  .header-icon-btn {
+    margin-left: auto;
+    width: 36px;
+    height: 36px;
+    background: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .header-icon-btn svg { width: 16px; height: 16px; color: var(--night); }
+
+  /* Group selector */
+  .group-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .group-row::-webkit-scrollbar { display: none; }
+  .group-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px 7px 7px;
+    background: var(--white);
+    border: 1.5px solid var(--gray-light);
+    border-radius: 22px;
+    flex-shrink: 0;
+  }
+  .group-pill.active {
+    background: var(--night);
+    border-color: var(--night);
+  }
+  .group-pill.active .group-pill-text { color: white; }
+  .group-pill-avatars { display: flex; }
+  .group-mini-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--white);
+    margin-left: -7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+  }
+  .group-mini-avatar:first-child { margin-left: 0; }
+  .group-pill-text { font-size: 12px; font-weight: 600; color: var(--night); white-space: nowrap; }
+  .group-pill-add {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--coral-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .group-pill-add svg { width: 14px; height: 14px; color: var(--coral); }
+
+  /* Privacy notice */
+  .privacy-banner {
+    margin: 14px 24px 0;
+    background: var(--purple-light);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .privacy-icon { font-size: 16px; flex-shrink: 0; }
+  .privacy-text { font-size: 11px; color: #5B21B6; line-height: 1.4; }
+  .privacy-text strong { font-weight: 700; }
+
+  /* Scroll content */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px 16px;
+    scrollbar-width: none;
+  }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  /* Members strip */
+  .members-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid var(--gray-light);
+  }
+  .members-avatars { display: flex; }
+  .member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    margin-left: -9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+  }
+  .member-avatar:first-child { margin-left: 0; }
+  .members-text { flex: 1; font-size: 12px; color: var(--gray); }
+  .members-text strong { color: var(--night); font-weight: 600; }
+  .members-chat-btn {
+    width: 34px;
+    height: 34px;
+    background: var(--coral-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .members-chat-btn svg { width: 16px; height: 16px; color: var(--coral); }
+
+  /* Day group */
+  .day-group { margin-bottom: 20px; }
+  .day-label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--night);
+    margin-bottom: 10px;
+  }
+
+  /* Shared event card */
+  .shared-event {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid var(--gray-light);
+  }
+  .shared-event-top {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .shared-emoji {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+  }
+  .shared-info { flex: 1; min-width: 0; }
+  .shared-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--night);
+    margin-bottom: 3px;
+  }
+  .shared-meta { font-size: 11px; color: var(--gray); }
+
+  /* Who's going breakdown */
+  .going-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-light);
+  }
+  .going-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px 4px 4px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .going-chip-avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .going-confirmed { background: var(--green-light); color: #16A34A; }
+  .going-maybe { background: var(--amber-light); color: #B45309; }
+  .going-invite {
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--warm-white);
+    color: var(--gray);
+    border: 1px dashed var(--gray-light);
+  }
+
+  /* Sync suggestion card */
+  .sync-card {
+    background: linear-gradient(135deg, var(--coral) 0%, #FF8A7A 100%);
+    border-radius: 18px;
+    padding: 16px;
+    margin-top: 4px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sync-emoji {
+    position: absolute;
+    right: -8px;
+    bottom: -12px;
+    font-size: 70px;
+    opacity: 0.18;
+  }
+  .sync-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .sync-text {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .sync-btn {
+    display: inline-block;
+    background: white;
+    color: var(--coral);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 20px;
+    position: relative;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    background: var(--white);
+    border-top: 1px solid var(--gray-light);
+    padding: 10px 0 24px;
+    display: flex;
+    justify-content: space-around;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 16px;
+    position: relative;
+  }
+  .nav-item svg { width: 22px; height: 22px; color: var(--gray); }
+  .nav-item.active svg { color: var(--coral); }
+  .nav-label { font-size: 10px; font-weight: 500; color: var(--gray); }
+  .nav-item.active .nav-label { color: var(--coral); font-weight: 600; }
+  .nav-dot {
+    width: 4px; height: 4px; background: var(--coral); border-radius: 50%;
+    position: absolute; bottom: -2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <div class="status-bar">
+    <span class="time">20:14</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </div>
+      <div class="page-title">Agenda partagé</div>
+      <div class="header-icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+
+    <!-- Group selector -->
+    <div class="group-row">
+      <div class="group-pill active">
+        <div class="group-pill-avatars">
+          <div class="group-mini-avatar" style="background:#FF5C57;">M</div>
+          <div class="group-mini-avatar" style="background:#8B5CF6;">L</div>
+          <div class="group-mini-avatar" style="background:#22C55E;">T</div>
+        </div>
+        <span class="group-pill-text">Bande du Jeudi</span>
+      </div>
+      <div class="group-pill">
+        <div class="group-pill-avatars">
+          <div class="group-mini-avatar" style="background:#F59E0B;">A</div>
+          <div class="group-mini-avatar" style="background:#EC4899;">S</div>
+        </div>
+        <span class="group-pill-text">Jeux & Café</span>
+      </div>
+      <div class="group-pill-add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy notice -->
+  <div class="privacy-banner">
+    <span class="privacy-icon">🔒</span>
+    <div class="privacy-text">Seuls les events que tu marques <strong>visibles</strong> apparaissent ici. Le reste de ton agenda reste privé.</div>
+  </div>
+
+  <!-- Scroll content -->
+  <div class="scroll-area">
+
+    <!-- Members strip -->
+    <div class="members-strip">
+      <div class="members-avatars">
+        <div class="member-avatar" style="background:#FF5C57;">M</div>
+        <div class="member-avatar" style="background:#8B5CF6;">L</div>
+        <div class="member-avatar" style="background:#22C55E;">T</div>
+        <div class="member-avatar" style="background:#F59E0B;">A</div>
+        <div class="member-avatar" style="background:#EC4899;">+1</div>
+      </div>
+      <div class="members-text"><strong>5 Buddies</strong> · Bande du Jeudi</div>
+      <div class="members-chat-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </div>
+    </div>
+
+    <!-- Sync suggestion -->
+    <div class="sync-card">
+      <div class="sync-emoji">🎉</div>
+      <div class="sync-title">Vous êtes 3 disponibles ce week-end</div>
+      <div class="sync-text">Marc, Léa et Tom ont marqué le samedi libre. C'est peut-être le moment de proposer une sortie ?</div>
+      <div class="sync-btn">Proposer un event →</div>
+    </div>
+
+    <!-- This week -->
+    <div class="day-group">
+      <div class="day-label">Jeudi 3 juillet</div>
+
+      <div class="shared-event">
+        <div class="shared-event-top">
+          <div class="shared-emoji" style="background: var(--coral-light);">🎭</div>
+          <div class="shared-info">
+            <div class="shared-title">Les Impromptus du Jeudi</div>
+            <div class="shared-meta">20h30 · Le Ferrailleur · 1,2 km</div>
+          </div>
+        </div>
+        <div class="going-breakdown">
+          <div class="going-chip going-confirmed">
+            <div class="going-chip-avatar" style="background:#FF5C57;">M</div>
+            Marc
+          </div>
+          <div class="going-chip going-confirmed">
+            <div class="going-chip-avatar" style="background:#8B5CF6;">L</div>
+            Léa
+          </div>
+          <div class="going-chip going-maybe">
+            <div class="going-chip-avatar" style="background:#22C55E;">T</div>
+            Tom ?
+          </div>
+          <div class="going-invite">+ Inviter</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekend -->
+    <div class="day-group">
+      <div class="day-label">Samedi 5 juillet</div>
+
+      <div class="shared-event">
+        <div class="shared-event-top">
+          <div class="shared-emoji" style="background: var(--green-light);">🌿</div>
+          <div class="shared-info">
+            <div class="shared-title">Vente de plantes — Racines</div>
+            <div class="shared-meta">17h00 · Bouffay · 0,8 km</div>
+          </div>
+        </div>
+        <div class="going-breakdown">
+          <div class="going-chip going-confirmed">
+            <div class="going-chip-avatar" style="background:#FF5C57;">M</div>
+            Marc
+          </div>
+          <div class="going-chip going-confirmed">
+            <div class="going-chip-avatar" style="background:#EC4899;">S</div>
+            Sarah
+          </div>
+          <div class="going-invite">+ Inviter</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z"/></svg>
+      <span class="nav-label">Accueil</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span class="nav-label">Explorer</span>
+    </div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="nav-label">Agenda</span>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span class="nav-label">Messages</span>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+/* OM_NAV_WIRED */
+(function(){
+  var MAP = {"Accueil":"Accueil.dc.html","Explorer":"Explorer.dc.html","Agenda":"Agenda.dc.html","Messages":"Messages-Liste.dc.html"};
+  function omnav(file){
+    try { window.parent && window.parent.postMessage({type:'omnav', file:file}, '*'); } catch(e){}
+  }
+  window.__omnav = omnav;
+  document.querySelectorAll('.nav-item').forEach(function(it){
+    var lbl = it.querySelector('.nav-label');
+    if(!lbl) return;
+    var target = MAP[lbl.textContent.trim()];
+    if(!target) return;
+    it.style.cursor = 'pointer';
+    it.addEventListener('click', function(){ omnav(target); });
+  });
+})();
+</script>
+</body>
+</html>

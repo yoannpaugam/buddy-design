@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #E8E4DF; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 24px 16px; }
+  .rf-scroll::-webkit-scrollbar { display: none; }
+  .rf-dual-thumb { -webkit-appearance: none; appearance: none; pointer-events: none; }
+  .rf-dual-thumb::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 3px solid #FF5C57; box-shadow: 0 2px 6px rgba(0,0,0,0.2); pointer-events: auto; cursor: pointer; margin-top: 0; }
+  .rf-dual-thumb::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 3px solid #FF5C57; box-shadow: 0 2px 6px rgba(0,0,0,0.2); pointer-events: auto; cursor: pointer; }
+  .rf-dual-thumb::-webkit-slider-runnable-track { background: transparent; }
+  .rf-dual-thumb::-moz-range-track { background: transparent; }
+</style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#F7F4F0; border-radius:48px; overflow:hidden; position:relative; display:flex; flex-direction:column;">
+
+  <!-- Search header (dark) -->
+  <div style="background:#1A1A2E; flex-shrink:0; padding:14px 24px 20px;">
+    <div style="padding-bottom:14px;">
+      <span style="font-weight:600; font-size:15px; color:#fff;">20:14</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+      <div onClick="{{ onBack }}" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </div>
+      <div style="flex:1; background:rgba(255,255,255,0.12); border-radius:14px; padding:11px 16px; display:flex; align-items:center; gap:10px; border:1.5px solid rgba(255,255,255,0.2);">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="théâtre impro" style="background:transparent; border:none; outline:none; font-family:'Inter',sans-serif; font-size:15px; color:#fff; flex:1;" />
+        <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ onClearQuery }}" style="width:18px; height:18px; background:rgba(255,255,255,0.25); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="background:rgba(255,92,87,0.15); border:1px solid rgba(255,92,87,0.3); border-radius:10px; padding:8px 14px; font-size:12px; color:#FFB3B1; line-height:1.5;">
+      <strong style="color:#fff; font-weight:600;">{{ summaryWhen }}</strong> · entre <strong style="color:#fff; font-weight:600;">{{ summaryTime }}</strong> · dans un rayon de <strong style="color:#fff; font-weight:600;">{{ summaryDist }}</strong> · <strong style="color:#fff; font-weight:600;">{{ summaryPrice }}</strong><sc-if value="{{ hasCatsSummary }}" hint-placeholder-val="{{ true }}"> · <strong style="color:#fff; font-weight:600;">{{ summaryCats }}</strong></sc-if>
+    </div>
+  </div>
+
+  <!-- Filter body -->
+  <div class="rf-scroll" style="flex:1; overflow-y:auto; background:#F7F4F0;">
+
+    <!-- DATE -->
+    <div style="padding:20px 24px 0;">
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin-bottom:12px; display:flex; align-items:center; gap:8px;"><span style="font-size:15px;">📅</span> Quand ?</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <sc-for list="{{ dateOptions }}" as="d" hint-placeholder-count="4">
+          <div onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- HEURE -->
+    <div style="padding:20px 24px 0; margin-top:20px;">
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin-bottom:12px; display:flex; align-items:center; gap:8px;"><span style="font-size:15px;">🕐</span> Entre quelle heure ?</div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div onClick="{{ onOpenFromTime }}" style="flex:1; background:#FFE8E7; border:1.5px solid #FF5C57; border-radius:12px; padding:10px 14px; cursor:pointer;">
+          <div style="font-size:11px; color:#6B7280; margin-bottom:2px;">À partir de</div>
+          <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; color:#FF5C57;">{{ fromTimeLabel }}</div>
+        </div>
+        <div style="color:#6B7280; font-size:18px;">→</div>
+        <div onClick="{{ onOpenToTime }}" style="flex:1; background:#FFE8E7; border:1.5px solid #FF5C57; border-radius:12px; padding:10px 14px; cursor:pointer;">
+          <div style="font-size:11px; color:#6B7280; margin-bottom:2px;">Jusqu'à</div>
+          <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; color:#FF5C57;">{{ toTimeLabel }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px; background:#E5E2DE; margin:20px 24px 0;"></div>
+
+    <!-- DISTANCE -->
+    <div style="padding:20px 24px 0; margin-top:20px;">
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin-bottom:12px; display:flex; align-items:center; gap:8px;"><span style="font-size:15px;">📍</span> Distance maximum</div>
+      <div style="text-align:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; color:#1A1A2E; margin-bottom:10px;">{{ distValue }} <span style="font-size:13px; font-weight:500; color:#6B7280;">km</span></div>
+
+      <!-- mini map with draggable radius circle -->
+      <div ref="{{ mapRef }}" onPointerDown="{{ onMapDown }}" style="position:relative; width:100%; height:180px; border-radius:16px; overflow:hidden; background:#E8E0D5 url('assets/nantes-map.png') center/cover; touch-action:none; cursor:grab;">
+
+        <!-- radius circle -->
+        <div style="{{ circleStyle }}"></div>
+        <!-- draggable center pin -->
+        <div style="{{ pinWrapStyle }}">
+          <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:36px; height:36px; background:rgba(66,133,244,0.15); border-radius:50%;"></div>
+          <div style="width:16px; height:16px; background:#4285F4; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 6px rgba(66,133,244,0.4); position:relative;"></div>
+        </div>
+      </div>
+      <div style="text-align:center; font-size:11px; color:#9A948C; margin-top:8px;">Glisse le point pour déplacer le centre de recherche</div>
+
+      <input type="range" min="0.5" max="50" step="0.5" value="{{ distValue }}" onInput="{{ onDist }}" style="width:100%; accent-color:#FF5C57; margin-top:14px;" />
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:#6B7280; margin-top:2px;"><span>500 m</span><span>50 km</span></div>
+    </div>
+
+    <div style="height:1px; background:#E5E2DE; margin:20px 24px 0;"></div>
+
+    <!-- PRIX -->
+    <div style="padding:20px 24px 0; margin-top:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
+        <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; display:flex; align-items:center; gap:8px;"><span style="font-size:15px;">💶</span> Prix</div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#FF5C57;">{{ priceRangeLabel }}</div>
+      </div>
+      <div style="position:relative; height:34px; margin-bottom:2px;">
+        <div style="position:absolute; top:15px; left:0; right:0; height:4px; border-radius:2px; background:#E5E2DE;"></div>
+        <div style="{{ priceTrackFillStyle }}"></div>
+        <input type="range" min="0" max="100" step="5" value="{{ priceMin }}" onInput="{{ onPriceMin }}" style="position:absolute; top:0; left:0; width:100%; height:34px; margin:0; accent-color:#FF5C57; background:transparent; pointer-events:none;" class="rf-dual-thumb" />
+        <input type="range" min="0" max="100" step="5" value="{{ priceMax }}" onInput="{{ onPriceMax }}" style="position:absolute; top:0; left:0; width:100%; height:34px; margin:0; accent-color:#FF5C57; background:transparent; pointer-events:none;" class="rf-dual-thumb" />
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:#6B7280;"><span>Gratuit</span><span>100 € et +</span></div>
+    </div>
+
+    <div style="height:1px; background:#E5E2DE; margin:20px 24px 0;"></div>
+
+    <!-- CATÉGORIES -->
+    <div style="padding:20px 24px 24px; margin-top:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; display:flex; align-items:center; gap:8px;"><span style="font-size:15px;">🎯</span> Catégories</div>
+        <div onClick="{{ onToggleAllCats }}" style="font-size:12px; font-weight:600; color:#FF5C57; cursor:pointer;">{{ allCatsLabel }}</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
+        <sc-for list="{{ categories }}" as="c" hint-placeholder-count="9">
+          <div onClick="{{ c.onClick }}" style="{{ c.style }}">
+            <sc-if value="{{ c.active }}" hint-placeholder-val="{{ false }}">
+              <div style="width:16px; height:16px; border-radius:50%; background:#FF5C57; display:flex; align-items:center; justify-content:center; position:absolute; top:6px; right:6px;">
+                <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </sc-if>
+            <span style="font-size:22px;">{{ c.emoji }}</span>
+            <span style="{{ c.nameStyle }}">{{ c.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA bar -->
+  <div style="padding:14px 24px 28px; background:#fff; border-top:1px solid #E5E2DE; display:flex; gap:10px; flex-shrink:0;">
+    <div onClick="{{ onReset }}" style="padding:14px 20px; border-radius:16px; background:#F7F4F0; color:#6B7280; font-size:13px; font-weight:600; border:1.5px solid #E5E2DE; white-space:nowrap; cursor:pointer;">Réinitialiser</div>
+    <div onClick="{{ onSearch }}" style="flex:1; padding:14px; border-radius:16px; background:#FF5C57; color:#fff; font-size:14px; font-weight:700; font-family:'Poppins',sans-serif; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
+      Voir les résultats
+      <span style="background:rgba(255,255,255,0.25); border-radius:20px; padding:2px 8px; font-size:12px; font-weight:600;">{{ resultCount }}</span>
+    </div>
+  </div>
+
+  <!-- ============ DATE SHEET (choisir une date) ============ -->
+  <sc-if value="{{ dateSheetOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseSheets }}" style="position:absolute; inset:0; z-index:50; background:rgba(26,26,46,0.5); display:flex; flex-direction:column; justify-content:flex-end;">
+      <div onClick="{{ stop }}" style="background:#F7F4F0; border-radius:26px 26px 0 0; padding:8px 0 28px; box-shadow:0 -8px 40px rgba(0,0,0,0.25);">
+        <div style="width:40px; height:5px; border-radius:3px; background:#D6D0C8; margin:8px auto 12px;"></div>
+        <div style="padding:0 24px 14px; font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color:#1A1A2E;">Choisir une date</div>
+        <div style="padding:0 24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:14px; color:#1A1A2E;">Juillet 2026</div>
+          </div>
+          <div style="display:flex; margin-bottom:6px;">
+            <sc-for list="{{ dayNames }}" as="dn" hint-placeholder-count="7">
+              <div style="flex:1; text-align:center; font-size:10.5px; font-weight:600; color:#9A948C;">{{ dn }}</div>
+            </sc-for>
+          </div>
+          <sc-for list="{{ calWeeks }}" as="week" hint-placeholder-count="5">
+            <div style="display:flex; gap:2px; margin-bottom:2px;">
+              <sc-for list="{{ week }}" as="cell" hint-placeholder-count="7">
+                <div onClick="{{ cell.onClick }}" style="{{ cell.style }}">{{ cell.label }}</div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ TIME SHEET ============ -->
+  <sc-if value="{{ timeSheetOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseSheets }}" style="position:absolute; inset:0; z-index:50; background:rgba(26,26,46,0.5); display:flex; flex-direction:column; justify-content:flex-end;">
+      <div onClick="{{ stop }}" style="background:#F7F4F0; border-radius:26px 26px 0 0; padding:8px 0 28px; box-shadow:0 -8px 40px rgba(0,0,0,0.25);">
+        <div style="width:40px; height:5px; border-radius:3px; background:#D6D0C8; margin:8px auto 12px;"></div>
+        <div style="padding:0 24px 16px; font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color:#1A1A2E;">{{ timeSheetTitle }}</div>
+        <div class="rf-scroll" style="display:flex; gap:8px; overflow-x:auto; padding:0 24px 4px;">
+          <sc-for list="{{ hourOptions }}" as="h" hint-placeholder-count="8">
+            <div onClick="{{ h.onClick }}" style="{{ h.style }}">{{ h.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.CATS = [
+      { key:'theatre', emoji:'🎭', label:'Théâtre' },
+      { key:'concert', emoji:'🎵', label:'Concert' },
+      { key:'jeux', emoji:'🎲', label:'Jeux de société' },
+      { key:'expo', emoji:'🎨', label:'Expo & Art' },
+      { key:'marche', emoji:'🌿', label:'Marché' },
+      { key:'sport', emoji:'⚽', label:'Sport' },
+      { key:'gastro', emoji:'🍽️', label:'Gastronomie' },
+      { key:'conf', emoji:'📚', label:'Conférence' },
+      { key:'danse', emoji:'🕺', label:'Danse' },
+    ];
+    this.WHEN = ['Ce soir', 'Demain', 'Ce week-end'];
+    this.HOURS = ['08h','10h','12h','14h','15h','16h','17h','18h','19h','20h','21h','22h','23h','00h'];
+    this.DAYS_SHORT = ['L','M','M','J','V','S','D'];
+    this.state = {
+      query: 'théâtre impro',
+      when: 'Ce soir', customDate: null,
+      fromH: '15h', toH: '22h',
+      dist: 5,
+      priceMin: 0, priceMax: 20,
+      cats: { theatre:true, concert:true },
+      dateSheetOpen: false, timeSheetOpen: false, timeTarget: null,
+      centerX: 50, centerY: 50, // percent within map box
+    };
+    this.onMapDown = this.onMapDown.bind(this);
+  }
+
+  onMapDown(e){
+    const box = this.mapEl; if(!box) return;
+    const rect = box.getBoundingClientRect();
+    const move = (ev)=>{
+      let x = ((ev.clientX - rect.left) / rect.width) * 100;
+      let y = ((ev.clientY - rect.top) / rect.height) * 100;
+      x = Math.max(4, Math.min(96, x));
+      y = Math.max(4, Math.min(96, y));
+      this.setState({ centerX:x, centerY:y });
+    };
+    move(e);
+    const up = ()=>{
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  }
+
+  nav(file){ try { (window.parent||window).postMessage({type:'omnav', file:file}, '*'); } catch(e){} }
+  set(patch){ this.setState(patch); }
+
+  computeResultCount(S){
+    let n = 24;
+    if (S.when !== 'Ce soir') n -= 3;
+    if (S.dist < 10) n -= Math.round((10 - S.dist) * 0.8);
+    if (S.priceMax <= 20) n -= 6;
+    if (S.priceMin > 0) n -= 8;
+    const catCount = Object.values(S.cats).filter(Boolean).length;
+    if (catCount > 0) n = Math.max(3, n - (this.CATS.length - catCount) * 1.4);
+    return Math.max(1, Math.round(n));
+  }
+
+  renderVals(){
+    const S = this.state;
+
+    const dateOptions = this.WHEN.map(label => ({ label, onClick:()=>this.set({when:label, customDate:null}),
+      style:'padding:8px 16px; border-radius:22px; font-size:13px; font-weight:600; cursor:pointer; '
+        + (S.when===label && !S.customDate ? 'background:#FF5C57; color:#fff;' : 'background:#fff; color:#6B7280; border:1.5px solid #E5E2DE;') }));
+    dateOptions.push({ label: S.customDate ? S.customDate : 'Choisir une date', onClick:()=>this.set({dateSheetOpen:true}),
+      style:'padding:8px 16px; border-radius:22px; font-size:13px; font-weight:600; cursor:pointer; '
+        + (S.customDate ? 'background:#FFE8E7; color:#FF5C57; border:1.5px solid #FFB3B1;' : 'background:#fff; color:#6B7280; border:1.5px solid #E5E2DE;') });
+
+    const pMinPct = S.priceMin, pMaxPct = S.priceMax;
+    const priceTrackFillStyle = 'position:absolute; top:15px; height:4px; border-radius:2px; background:#FF5C57; left:'+pMinPct+'%; right:'+(100-pMaxPct)+'%;';
+
+    const allSelected = this.CATS.every(c=>S.cats[c.key]);
+    const categories = this.CATS.map(c=>{
+      const active = !!S.cats[c.key];
+      return {
+        emoji:c.emoji, label:c.label, active,
+        onClick:()=>{ const cats = Object.assign({}, S.cats); cats[c.key] = !cats[c.key]; this.set({cats}); },
+        style:'position:relative; background:'+(active?'#FFE8E7':'#fff')+'; border:1.5px solid '+(active?'#FFB3B1':'#E5E2DE')+'; border-radius:14px; padding:12px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;',
+        nameStyle:'font-size:11px; font-weight:'+(active?'600':'500')+'; color:'+(active?'#FF5C57':'#6B7280')+'; text-align:center; line-height:1.3;',
+      };
+    });
+
+    // calendar for date sheet (July 2026, 1 Jul = Tue per mockup convention)
+    const dim = 31, lead = 1;
+    const cells = [];
+    for (let i=0;i<lead;i++) cells.push({label:'', style:'flex:1; aspect-ratio:1;'});
+    for (let d=1; d<=dim; d++){
+      const label = 'Jeu. '+d+' juillet'; // placeholder date label format not needed per-cell
+      const isSel = S.customDate === (d+' juillet');
+      let st = 'flex:1; aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:12px; font-family:\'Poppins\',sans-serif; font-weight:600; font-size:13px; cursor:pointer; ';
+      st += isSel ? 'background:#FF5C57; color:#fff;' : 'color:#1A1A2E;';
+      cells.push({ label:String(d), style:st, onClick:()=>this.set({ customDate: d+' juillet', dateSheetOpen:false }) });
+    }
+    while (cells.length % 7 !== 0) cells.push({label:'', style:'flex:1; aspect-ratio:1;'});
+    const calWeeks = [];
+    for (let i=0;i<cells.length;i+=7) calWeeks.push(cells.slice(i,i+7));
+
+    const hourOptions = this.HOURS.map(h=>{
+      const target = S.timeTarget;
+      const active = (target==='from' && S.fromH===h) || (target==='to' && S.toH===h);
+      return { label:h, onClick:()=>{
+          if (S.timeTarget==='from') this.set({fromH:h, timeSheetOpen:false});
+          else this.set({toH:h, timeSheetOpen:false});
+        },
+        style:'flex-shrink:0; padding:10px 16px; border-radius:14px; font-family:\'Poppins\',sans-serif; font-weight:600; font-size:14px; cursor:pointer; '
+          + (active ? 'background:#FF5C57; color:#fff;' : 'background:#fff; color:#1A1A2E; border:1.5px solid #E5E2DE;') };
+    });
+
+    const priceLabel = S.priceMin===0 && S.priceMax>=100 ? 'Tous prix' : (S.priceMin+' € — '+(S.priceMax>=100?'100 €+':S.priceMax+' €'));
+    const catLabels = this.CATS.filter(c=>S.cats[c.key]).map(c=>c.label);
+
+    return {
+      query: S.query, hasQuery: S.query.length>0,
+      onQuery:(e)=>this.set({query:e.target.value}), onClearQuery:()=>this.set({query:''}),
+      onBack:()=>this.nav('Explorer.dc.html'),
+      summaryWhen: S.customDate || S.when,
+      summaryTime: S.fromH+' et '+S.toH,
+      summaryDist: (S.dist>=1 ? Math.round(S.dist) : S.dist)+' km',
+      summaryPrice: priceLabel,
+      hasCatsSummary: catLabels.length>0, summaryCats: catLabels.join(', '),
+      dateOptions,
+      fromTimeLabel: S.fromH+'00', toTimeLabel: S.toH+'00',
+      onOpenFromTime:()=>this.set({timeSheetOpen:true, timeTarget:'from'}),
+      onOpenToTime:()=>this.set({timeSheetOpen:true, timeTarget:'to'}),
+      distValue: S.dist, onDist:(e)=>this.set({dist:parseFloat(e.target.value)}),
+      priceMin: S.priceMin, priceMax: S.priceMax,
+      priceRangeLabel: priceLabel, priceTrackFillStyle,
+      onPriceMin:(e)=>{ const v=parseInt(e.target.value,10); this.set({priceMin: Math.min(v, S.priceMax)}); },
+      onPriceMax:(e)=>{ const v=parseInt(e.target.value,10); this.set({priceMax: Math.max(v, S.priceMin)}); },
+      categories,
+      allCatsLabel: allSelected ? 'Tout désélectionner' : 'Tout sélectionner',
+      onToggleAllCats: ()=>{
+        if (allSelected) { this.set({cats:{}}); return; }
+        const cats = {}; this.CATS.forEach(c=>{ cats[c.key]=true; }); this.set({cats});
+      },
+      onReset:()=>this.set({ when:'Ce soir', customDate:null, fromH:'15h', toH:'22h', dist:5, priceMin:0, priceMax:20, cats:{} }),
+      onSearch:()=>this.nav('Explorer.dc.html'),
+      resultCount: this.computeResultCount(S),
+      mapRef: (el)=>{ this.mapEl = el; }, onMapDown: this.onMapDown,
+      circleStyle: 'position:absolute; top:'+S.centerY+'%; left:'+S.centerX+'%; transform:translate(-50%,-50%); width:'+Math.min(300, S.dist*6)+'px; height:'+Math.min(300, S.dist*6)+'px; border-radius:50%; background:rgba(255,92,87,0.16); border:2px solid rgba(255,92,87,0.5); pointer-events:none;',
+      pinWrapStyle: 'position:absolute; top:'+S.centerY+'%; left:'+S.centerX+'%; transform:translate(-50%,-50%); display:flex; align-items:center; justify-content:center; cursor:grab;',
+      dateSheetOpen: S.dateSheetOpen, timeSheetOpen: S.timeSheetOpen,
+      timeSheetTitle: S.timeTarget==='from' ? 'À partir de quelle heure ?' : 'Jusqu\u2019à quelle heure ?',
+      onCloseSheets:()=>this.set({dateSheetOpen:false, timeSheetOpen:false}),
+      stop:(e)=>{ e.stopPropagation(); },
+      dayNames: this.DAYS_SHORT, calWeeks, hourOptions,
+    };
+  }
+}
+</script>
+</body>
+</html>

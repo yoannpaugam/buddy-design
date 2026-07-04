@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #E8E4DF; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 24px 16px; }
+  .ob-scroll::-webkit-scrollbar { display: none; }
+</style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#F7F4F0; border-radius:48px; overflow:hidden; position:relative; display:flex; flex-direction:column;">
+
+  <!-- ============ 0: WELCOME ============ -->
+  <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex; flex-direction:column; height:100%; background:linear-gradient(160deg,#1A1A2E 0%,#2D2255 100%); position:relative;">
+      <div style="padding:14px 24px 0;"><span style="font-weight:600; font-size:14px; color:#fff;">20:14</span></div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 32px 100px; text-align:center;">
+        <div style="font-family:'Caprasimo',cursive; font-weight:400; color:#FF5C57; font-size:48px; letter-spacing:0; margin-bottom:4px;">Buddy</div>
+        <div style="font-size:15px; color:rgba(255,255,255,0.65); margin-bottom:32px; line-height:1.5;">Le pote qui manquait à tes sorties.</div>
+        <div style="display:flex; flex-direction:column; gap:10px; width:100%;">
+          <sc-for list="{{ welcomePills }}" as="p" hint-placeholder-count="3">
+            <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px 16px; display:flex; align-items:center; gap:12px; text-align:left;">
+              <span style="font-size:22px; flex-shrink:0;">{{ p.icon }}</span>
+              <div>
+                <div style="font-size:13px; font-weight:700; color:#fff; margin-bottom:1px;">{{ p.title }}</div>
+                <div style="font-size:11px; color:rgba(255,255,255,0.5);">{{ p.sub }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="position:absolute; left:24px; right:24px; bottom:56px; text-align:center; font-size:12px; color:rgba(255,255,255,0.4);">Déjà un compte ? <strong onClick="{{ onLogin }}" style="color:rgba(255,255,255,0.75); cursor:pointer;">Se connecter</strong></div>
+      <div onClick="{{ onNext }}" style="position:absolute; left:24px; right:24px; bottom:26px; padding:15px; background:#FF5C57; border-radius:16px; text-align:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#fff; cursor:pointer;">Créer mon compte</div>
+    </div>
+  </sc-if>
+
+  <!-- ============ 1: CONCEPT ============ -->
+  <sc-if value="{{ isConcept }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; height:100%; background:linear-gradient(180deg,#FFE8E7 0%,#F7F4F0 220px); position:relative;">
+      <div style="padding:14px 24px 0; flex-shrink:0;"><span style="font-weight:600; font-size:14px; color:#1A1A2E;">20:14</span></div>
+      <div style="display:flex; justify-content:center; gap:6px; padding:14px 0 0; flex-shrink:0;">
+        <sc-for list="{{ introDots }}" as="d" hint-placeholder-count="3"><div style="{{ d.style }}"></div></sc-for>
+      </div>
+      <div style="padding:20px 24px 0; flex-shrink:0;">
+        <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#1A1A2E; margin-bottom:8px;">Comment ça marche ?</div>
+        <div style="font-size:13px; color:#6B7280; line-height:1.5; margin-bottom:20px;">Buddy, c'est trois choses simples qui s'enchaînent.</div>
+      </div>
+      <div class="ob-scroll" style="flex:1; overflow-y:auto; padding:0 24px 100px;">
+        <sc-for list="{{ concepts }}" as="c" hint-placeholder-count="3">
+          <div style="background:#fff; border-radius:18px; padding:16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(0,0,0,0.04); display:flex; gap:14px; align-items:flex-start;">
+            <div style="width:44px; height:44px; border-radius:12px; background:{{ c.bg }}; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">{{ c.icon }}</div>
+            <div>
+              <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14.5px; color:#1A1A2E; margin-bottom:4px;">{{ c.title }}</div>
+              <div style="font-size:12.5px; color:#6B7280; line-height:1.5;">{{ c.text }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div onClick="{{ onNext }}" style="position:absolute; left:24px; right:24px; bottom:26px; padding:15px; background:#FF5C57; border-radius:16px; text-align:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#fff; cursor:pointer;">Suivant →</div>
+    </div>
+  </sc-if>
+
+  <!-- ============ 2: CHARTE ============ -->
+  <sc-if value="{{ isCharte }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; height:100%; background:linear-gradient(180deg,#EDE9FE 0%,#F7F4F0 220px); position:relative;">
+      <div style="padding:14px 24px 0; flex-shrink:0;"><span style="font-weight:600; font-size:14px; color:#1A1A2E;">20:14</span></div>
+      <div style="display:flex; justify-content:center; gap:6px; padding:14px 0 0; flex-shrink:0;">
+        <sc-for list="{{ introDots }}" as="d" hint-placeholder-count="3"><div style="{{ d.style }}"></div></sc-for>
+      </div>
+      <div style="padding:20px 24px 0; flex-shrink:0;">
+        <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#1A1A2E; margin-bottom:8px;">Notre charte</div>
+        <div style="font-size:13px; color:#6B7280; line-height:1.5; margin-bottom:16px;">Buddy fonctionne parce que ceux qui l'utilisent se respectent. Quelques principes non négociables.</div>
+      </div>
+      <div class="ob-scroll" style="flex:1; overflow-y:auto; padding:0 24px 130px;">
+        <sc-for list="{{ charter }}" as="c" hint-placeholder-count="4">
+          <div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:16px;">
+            <div style="width:38px; height:38px; border-radius:50%; background:{{ c.bg }}; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">{{ c.icon }}</div>
+            <div>
+              <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; color:#1A1A2E; margin-bottom:3px;">{{ c.title }}</div>
+              <div style="font-size:12px; color:#6B7280; line-height:1.5;">{{ c.text }}</div>
+            </div>
+          </div>
+        </sc-for>
+        <div onClick="{{ onOpenFaq }}" style="display:flex; align-items:center; gap:10px; background:#fff; border:1.5px solid #E5E2DE; border-radius:14px; padding:12px 14px; margin:4px 0 8px; cursor:pointer;">
+          <div style="width:32px; height:32px; border-radius:10px; background:#FFE8E7; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">❓</div>
+          <div style="flex:1; font-size:12.5px; color:#1A1A2E; line-height:1.4;">Des questions ? Retrouve la <strong style="color:#FF5C57;">FAQ</strong> à tout moment dans <strong>Moi → Paramètres → Aide</strong>.</div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A948C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+      <div onClick="{{ onToggleCharter }}" style="position:absolute; left:24px; right:24px; bottom:96px; display:flex; align-items:center; gap:10px; cursor:pointer;">
+        <div style="{{ charterCheckStyle }}">
+          <sc-if value="{{ charterAccepted }}" hint-placeholder-val="{{ false }}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </sc-if>
+        </div>
+        <div style="font-size:12.5px; color:#1A1A2E; line-height:1.4;">J'ai lu et j'accepte la charte Buddy</div>
+      </div>
+      <div onClick="{{ onNext }}" style="{{ charterBtnStyle }} position:absolute; left:24px; right:24px; bottom:26px;">Suivant →</div>
+    </div>
+  </sc-if>
+
+  <!-- ============ 3: VILLE ============ -->
+  <sc-if value="{{ isCity }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; height:100%; position:relative;">
+      <div style="padding:14px 24px 0; flex-shrink:0;"><span style="font-weight:600; font-size:14px; color:#1A1A2E;">20:14</span></div>
+      <div style="display:flex; justify-content:center; gap:6px; padding:14px 0 0; flex-shrink:0;">
+        <sc-for list="{{ stepDots }}" as="d" hint-placeholder-count="3"><div style="{{ d.style }}"></div></sc-for>
+      </div>
+      <div style="padding:12px 24px 0; flex-shrink:0;">
+        <div style="font-size:11px; font-weight:700; color:#FF5C57; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px;">Étape 1 sur 3</div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#1A1A2E; margin-bottom:6px;">Tu es où ?</div>
+        <div style="font-size:13px; color:#6B7280; line-height:1.5; margin-bottom:20px;">Buddy adapte les events à ta localisation. Tu pourras la changer à tout moment.</div>
+      </div>
+      <div class="ob-scroll" style="flex:1; overflow-y:auto; padding:0 24px 110px;">
+        <div style="background:#fff; border:2px solid #FF5C57; border-radius:14px; padding:13px 16px; display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#FF5C57"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <input value="{{ city }}" onInput="{{ onCityInput }}" style="flex:1; border:none; outline:none; background:transparent; font-size:15px; font-weight:600; color:#1A1A2E;" />
+        </div>
+        <div onClick="{{ onUseGps }}" style="background:{{ gpsBg }}; border:1.5px solid {{ gpsBorder }}; border-radius:14px; padding:13px 16px; display:flex; align-items:center; gap:10px; margin-bottom:24px; cursor:pointer;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="{{ gpsColor }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span style="font-size:13px; color:{{ gpsColor }}; font-weight:600;">{{ gpsLabel }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+          <span style="font-size:13px; font-weight:600; color:#1A1A2E;">Rayon de recherche par défaut</span>
+          <span style="font-family:'Poppins',sans-serif; font-weight:800; font-size:20px; color:#1A1A2E;">{{ radius }} <span style="font-size:13px; font-weight:500; color:#6B7280;">km</span></span>
+        </div>
+        <input type="range" min="1" max="30" step="1" value="{{ radius }}" onInput="{{ onRadius }}" style="width:100%; accent-color:#FF5C57;" />
+        <div style="font-size:11px; color:#6B7280; text-align:center; margin-top:8px;">Tu pourras affiner à chaque recherche</div>
+      </div>
+      <div onClick="{{ onNext }}" style="position:absolute; left:0; right:0; bottom:92px; text-align:center; font-size:12px; color:#6B7280; font-weight:500; cursor:pointer;">Passer cette étape</div>
+      <div onClick="{{ onNext }}" style="position:absolute; left:24px; right:24px; bottom:26px; padding:15px; background:#FF5C57; border-radius:16px; text-align:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#fff; cursor:pointer;">Continuer →</div>
+    </div>
+  </sc-if>
+
+  <!-- ============ 4: INTÉRÊTS ============ -->
+  <sc-if value="{{ isInterests }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; height:100%; position:relative;">
+      <div style="padding:14px 24px 0; flex-shrink:0;"><span style="font-weight:600; font-size:14px; color:#1A1A2E;">20:14</span></div>
+      <div style="display:flex; justify-content:center; gap:6px; padding:14px 0 0; flex-shrink:0;">
+        <sc-for list="{{ stepDots }}" as="d" hint-placeholder-count="3"><div style="{{ d.style }}"></div></sc-for>
+      </div>
+      <div style="padding:12px 24px 0; flex-shrink:0;">
+        <div style="font-size:11px; font-weight:700; color:#FF5C57; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px;">Étape 2 sur 3</div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#1A1A2E; margin-bottom:6px;">Qu'est-ce qui te fait sortir ?</div>
+        <div style="font-size:13px; color:#6B7280; line-height:1.5; margin-bottom:14px;">Choisis au moins 2. Buddy te proposera des events qui te ressemblent.</div>
+      </div>
+      <div class="ob-scroll" style="flex:1; overflow-y:auto; padding:0 24px 100px;">
+        <div style="text-align:center; font-size:12px; color:#6B7280; margin-bottom:12px;"><strong style="color:#FF5C57;">{{ interestCount }} sélectionné(s)</strong> · minimum 2</div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
+          <sc-for list="{{ interests }}" as="i" hint-placeholder-count="12">
+            <div onClick="{{ i.onClick }}" style="{{ i.style }}">
+              <sc-if value="{{ i.active }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; top:6px; right:6px; width:16px; height:16px; border-radius:50%; background:#FF5C57; display:flex; align-items:center; justify-content:center;">
+                  <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </sc-if>
+              <span style="font-size:24px;">{{ i.emoji }}</span>
+              <span style="{{ i.nameStyle }}">{{ i.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div onClick="{{ onNext }}" style="{{ interestBtnStyle }} position:absolute; left:24px; right:24px; bottom:26px;">Continuer →</div>
+    </div>
+  </sc-if>
+
+  <!-- ============ 5: PROFIL ============ -->
+  <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; height:100%; position:relative;">
+      <div style="padding:14px 24px 0; flex-shrink:0;"><span style="font-weight:600; font-size:14px; color:#1A1A2E;">20:14</span></div>
+      <div style="display:flex; justify-content:center; gap:6px; padding:14px 0 0; flex-shrink:0;">
+        <sc-for list="{{ stepDots }}" as="d" hint-placeholder-count="3"><div style="{{ d.style }}"></div></sc-for>
+      </div>
+      <div style="padding:12px 24px 0; flex-shrink:0;">
+        <div style="font-size:11px; font-weight:700; color:#FF5C57; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px;">Étape 3 sur 3</div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#1A1A2E; margin-bottom:6px;">Comment tu t'appelles ?</div>
+        <div style="font-size:13px; color:#6B7280; line-height:1.5; margin-bottom:20px;">Les gens verront ça quand tu rejoins un event ou que tu lances un appel.</div>
+      </div>
+      <div class="ob-scroll" style="flex:1; overflow-y:auto; padding:0 24px 100px;">
+        <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:20px;">
+          <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,#FF5C57 0%,#FF8A7A 100%); display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:800; font-size:28px; color:#fff; margin-bottom:10px; position:relative;">
+            {{ initial }}
+            <div style="position:absolute; bottom:0; right:0; width:26px; height:26px; background:#E5E2DE; border-radius:50%; border:2.5px solid #F7F4F0; display:flex; align-items:center; justify-content:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </div>
+          </div>
+          <div style="font-size:11.5px; color:#6B7280;">Ajouter une photo (optionnel)</div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Prénom</div>
+          <input value="{{ name }}" onInput="{{ onName }}" style="width:100%; background:#fff; border:1.5px solid #FF5C57; border-radius:12px; padding:12px 14px; font-size:14px; font-weight:600; color:#1A1A2E;" />
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Bio courte</div>
+          <textarea value="{{ bio }}" onInput="{{ onBio }}" maxlength="140" style="width:100%; background:#fff; border:2px solid #FF5C57; border-radius:12px; padding:12px 14px; font-size:13px; color:#1A1A2E; line-height:1.5; height:70px; resize:none;"></textarea>
+          <div style="font-size:10px; color:#6B7280; text-align:right; margin-top:4px;">{{ bioCount }} / 140</div>
+
+          <sc-if value="{{ hasSuggestedBios }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:10.5px; color:#9A948C; margin:10px 0 6px; display:flex; align-items:center; gap:5px;">✨ Suggestions selon tes goûts</div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <sc-for list="{{ suggestedBios }}" as="s" hint-placeholder-count="2">
+                <div onClick="{{ s.onClick }}" style="background:#fff; border:1.5px solid #E5E2DE; border-radius:12px; padding:10px 12px; font-size:12px; color:#1A1A2E; line-height:1.45; cursor:pointer;">{{ s.text }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div style="background:#DCFCE7; border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:8px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div style="font-size:11px; color:#166534; line-height:1.4;">Seul ton prénom et ta bio sont visibles. Ton nom complet et ton email restent privés.</div>
+        </div>
+      </div>
+      <div onClick="{{ onNext }}" style="{{ profileBtnStyle }} position:absolute; left:24px; right:24px; bottom:26px;">{{ profileBtnLabel }}</div>
+    </div>
+  </sc-if>
+
+  <!-- ============ 6: SUCCÈS ============ -->
+  <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; height:100%; background:linear-gradient(160deg,#1A1A2E 0%,#2D2255 100%); position:relative;">
+      <div style="padding:14px 24px 0;"><span style="font-weight:600; font-size:14px; color:#fff;">20:14</span></div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 32px 100px; text-align:center;">
+        <div style="font-size:56px; margin-bottom:18px;">🎉</div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:24px; color:#fff; margin-bottom:10px;">Bienvenue, {{ name }} !</div>
+        <div style="font-size:14px; color:rgba(255,255,255,0.65); line-height:1.6;">Ton compte est prêt. Direction {{ city }} pour découvrir tes premiers events.</div>
+      </div>
+      <div onClick="{{ onFinish }}" style="position:absolute; left:24px; right:24px; bottom:26px; padding:15px; background:#FF5C57; border-radius:16px; text-align:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#fff; cursor:pointer;">C'est parti ! 🎉</div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.WELCOME_PILLS = [
+      { icon:'🔍', title:'Trouve des events près de toi', sub:'Concerts, théâtre, marchés, tournois… tout ce qui se passe' },
+      { icon:'👋', title:'Lance un appel, trouve quelqu\u2019un', sub:'Un inconnu devient un Buddy, parfois pour longtemps' },
+      { icon:'📅', title:'Sortez ensemble, planifiez ensemble', sub:'Agenda partagé, groupes, tout au même endroit' },
+    ];
+    this.CONCEPTS = [
+      { icon:'🗺️', bg:'#FFE8E7', title:'Découvre', text:'Buddy référence les events locaux, même les petits que Google ne connaît pas — impro, vide-grenier, marché de plantes...' },
+      { icon:'👋', bg:'#EDE9FE', title:'Appelle', text:'Envie d\u2019y aller mais personne sous la main ? Lance un appel ouvert et trouve quelqu\u2019un sur place.' },
+      { icon:'👥', bg:'#DCFCE7', title:'Retrouve-toi', text:'Les gens croisés deviennent des Buddies. Formez un groupe, partagez votre agenda, sortez plus souvent.' },
+    ];
+    this.CHARTER = [
+      { icon:'💛', bg:'#FFE8E7', title:'Bienveillance', text:'On est ici pour passer un bon moment, pas pour juger. Chaque profil, chaque message mérite du respect.' },
+      { icon:'🤝', bg:'#EDE9FE', title:'Entraide', text:'Un Buddy, c\u2019est quelqu\u2019un qui donne un coup de main : accueillir un nouveau, partager une info, rassurer avant un event.' },
+      { icon:'🛡️', bg:'#DCFCE7', title:'Sécurité', text:'Rejoins toujours un event en lieu public, préviens un proche, et signale tout comportement qui te met mal à l\u2019aise.' },
+      { icon:'🌿', bg:'#FEF3C7', title:'Respect de l\u2019environnement', text:'Privilégie les mobilités douces et les lieux engagés quand tu le peux. Sortir plus, pas polluer plus.' },
+    ];
+    this.INTERESTS = [
+      { key:'theatre', emoji:'🎭', label:'Théâtre' },
+      { key:'concerts', emoji:'🎵', label:'Concerts' },
+      { key:'expo', emoji:'🎨', label:'Expo & Art' },
+      { key:'jeux', emoji:'🎲', label:'Jeux de société' },
+      { key:'marches', emoji:'🌿', label:'Marchés' },
+      { key:'sport', emoji:'⚽', label:'Sport' },
+      { key:'histoire', emoji:'🏛️', label:'Histoire' },
+      { key:'gastro', emoji:'🍽️', label:'Gastronomie' },
+      { key:'conf', emoji:'📚', label:'Conférences' },
+      { key:'danse', emoji:'🕺', label:'Danse' },
+      { key:'standup', emoji:'🎤', label:'Stand-up' },
+      { key:'nocturnes', emoji:'🌙', label:'Nocturnes' },
+    ];
+    this.state = {
+      step: 0,
+      charterAccepted: false,
+      city: 'Nantes', gpsActive: false, radius: 5,
+      interests: { theatre:true, concerts:true, jeux:true },
+      name: 'Thomas', bio: '',
+    };
+  }
+
+  nav(file){ try { (window.parent||window).postMessage({type:'omnav', file:file}, '*'); } catch(e){} }
+
+  renderVals(){
+    const S = this.state;
+    const step = S.step;
+
+    const introDots = [0,1,2].map(i=>({ style:'height:6px; border-radius:3px; transition:width .3s; width:'+(i===step?'20px':'6px')+'px; background:'+(i<=step?'#FF5C57':'#E5E2DE')+';' }));
+    // step dots for the 3-step form (city=3, interests=4, profile=5) mapped to 0,1,2
+    const formIndex = step - 3;
+    const stepDots = [0,1,2].map(i=>({ style:'height:6px; border-radius:3px; transition:width .3s; width:'+(i===formIndex?'20px':'6px')+'px; background:'+(i<=formIndex?'#FF5C57':'#E5E2DE')+';' }));
+
+    const charterBtnBase = 'padding:15px; border-radius:16px; text-align:center; font-family:\'Poppins\',sans-serif; font-weight:700; font-size:15px; cursor:pointer; box-sizing:border-box; ';
+    const interestCount = Object.values(S.interests).filter(Boolean).length;
+    const canContinueInterests = interestCount >= 2;
+    const interestBtnStyle = charterBtnBase + (canContinueInterests ? 'background:#FF5C57; color:#fff;' : 'background:#E5E2DE; color:#9A948C; cursor:not-allowed;');
+    const canContinueProfile = S.name.trim().length > 0;
+
+    const chosenKeys = Object.keys(S.interests).filter(k=>S.interests[k]);
+    const activityLabels = chosenKeys.map(k=>{ const i=this.INTERESTS.find(x=>x.key===k); return i ? i.label.toLowerCase() : null; }).filter(Boolean);
+    let activitiesText = 'sortir et rencontrer du monde';
+    if (activityLabels.length === 1) activitiesText = activityLabels[0];
+    else if (activityLabels.length >= 2) activitiesText = activityLabels.slice(0,-1).join(', ') + ' et ' + activityLabels[activityLabels.length-1];
+    const firstName = S.name.trim() || 'Thomas';
+    const genericBio = 'Salut, je m\u2019appelle ' + firstName + ', je vis à ' + S.city + ', j\u2019aime ' + activitiesText + '. Je suis partant(e) pour faire des rencontres :)';
+    const suggestedBios = [{ text: genericBio, onClick:()=>this.setState({bio:genericBio.slice(0,140)}) }];
+
+    const interests = this.INTERESTS.map(i=>{
+      const active = !!S.interests[i.key];
+      return {
+        emoji:i.emoji, label:i.label, active,
+        onClick:()=>{ const int = Object.assign({}, S.interests); int[i.key] = !int[i.key]; this.setState({interests:int}); },
+        style:'position:relative; background:'+(active?'#FFE8E7':'#fff')+'; border:2px solid '+(active?'#FF5C57':'#E5E2DE')+'; border-radius:14px; padding:14px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;',
+        nameStyle:'font-size:10.5px; font-weight:600; color:'+(active?'#FF5C57':'#6B7280')+'; text-align:center; line-height:1.3;',
+      };
+    });
+
+    return {
+      isWelcome: step===0, isConcept: step===1, isCharte: step===2, isCity: step===3, isInterests: step===4, isProfile: step===5, isDone: step===6,
+      onNext: ()=>{
+        if (step===2 && !S.charterAccepted) return;
+        if (step===4 && !canContinueInterests) return;
+        if (step===5 && !canContinueProfile) return;
+        this.setState({step: step+1});
+      },
+      onLogin: ()=>this.nav('Accueil.dc.html'),
+      onFinish: ()=>this.nav('Accueil.dc.html'),
+      welcomePills: this.WELCOME_PILLS,
+      introDots, stepDots,
+      concepts: this.CONCEPTS,
+      charter: this.CHARTER,
+      charterAccepted: S.charterAccepted,
+      onToggleCharter: ()=>this.setState({charterAccepted: !S.charterAccepted}),
+      onOpenFaq: ()=>this.nav('FAQ.dc.html'),
+      charterCheckStyle: 'width:22px; height:22px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; '+(S.charterAccepted?'background:#FF5C57;':'background:#fff; border:1.5px solid #E5E2DE;'),
+      charterBtnStyle: charterBtnBase + (S.charterAccepted ? 'background:#FF5C57; color:#fff;' : 'background:#E5E2DE; color:#9A948C; cursor:not-allowed;'),
+      city: S.city, onCityInput:(e)=>this.setState({city:e.target.value}),
+      gpsActive: S.gpsActive,
+      onUseGps: ()=>this.setState({gpsActive:true, city:'Position GPS détectée'}),
+      gpsBg: S.gpsActive?'#FFE8E7':'#F7F4F0', gpsBorder: S.gpsActive?'#FF5C57':'#E5E2DE', gpsColor: S.gpsActive?'#FF5C57':'#6B7280',
+      gpsLabel: S.gpsActive ? 'Position GPS activée ✓' : 'Utiliser ma position GPS',
+      radius: S.radius, onRadius:(e)=>this.setState({radius:parseInt(e.target.value,10)}),
+      interestCount, interests, interestBtnStyle,
+      initial: (S.name.trim()[0]||'?').toUpperCase(),
+      name: S.name, onName:(e)=>this.setState({name:e.target.value}),
+      bio: S.bio, onBio:(e)=>this.setState({bio:e.target.value.slice(0,140)}), bioCount: S.bio.length,
+      suggestedBios, hasSuggestedBios: suggestedBios.length>0,
+      profileBtnStyle: charterBtnBase + (canContinueProfile ? 'background:#FF5C57; color:#fff;' : 'background:#E5E2DE; color:#9A948C; cursor:not-allowed;'),
+      profileBtnLabel: "Terminer →",
+    };
+  }
+}
+</script>
+</body>
+</html>

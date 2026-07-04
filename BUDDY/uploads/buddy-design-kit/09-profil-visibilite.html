@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Buddy — Profil & Visibilité</title>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --coral: #FF5C57;
+    --coral-light: #FFE8E7;
+    --coral-mid: #FFB3B1;
+    --night: #1A1A2E;
+    --warm-white: #F7F4F0;
+    --gray: #6B7280;
+    --gray-light: #E5E2DE;
+    --white: #FFFFFF;
+    --purple: #8B5CF6;
+    --purple-light: #EDE9FE;
+    --green: #22C55E;
+    --green-light: #DCFCE7;
+    --amber: #F59E0B;
+    --amber-light: #FEF3C7;
+  }
+
+  body {
+    background: #E8E4DF;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    padding: 24px 16px;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .phone-label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: #999;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: var(--warm-white);
+    border-radius: 46px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.07);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .status-bar {
+    padding: 14px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-weight: 600; font-size: 15px; }
+  .status-icons { display: flex; gap: 6px; }
+  .status-icons svg { width: 16px; height: 16px; }
+
+  /* ================================
+     ÉCRAN 1 — PROFIL PUBLIC
+  ================================ */
+  .screen-profil .status-bar { background: var(--night); color: white; }
+  .screen-profil .status-icons svg { fill: white; }
+
+  /* Hero profil */
+  .profil-hero {
+    background: linear-gradient(160deg, var(--night) 0%, #2D2255 100%);
+    padding: 14px 24px 28px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .profil-hero-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .profil-hero-topbar svg { width: 20px; height: 20px; color: white; }
+  .hero-edit-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+  }
+  .hero-edit-btn svg { width: 13px; height: 13px; }
+
+  .profil-identity {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+  }
+  .profil-avatar-wrap { position: relative; }
+  .profil-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--coral) 0%, #FF8A7A 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: white;
+    border: 3px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+  .profil-avatar-add {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 22px; height: 22px;
+    background: var(--coral);
+    border-radius: 50%;
+    border: 2px solid var(--night);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .profil-avatar-add svg { width: 10px; height: 10px; color: white; }
+
+  .profil-id-info { flex: 1; padding-bottom: 4px; }
+  .profil-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: white;
+    margin-bottom: 3px;
+  }
+  .profil-location {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .profil-location svg { width: 11px; height: 11px; }
+  .profil-member-since {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* Stats strip */
+  .profil-stats {
+    display: flex;
+    gap: 0;
+    margin-top: 20px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .profil-stat {
+    flex: 1;
+    text-align: center;
+    padding: 12px 8px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+  .profil-stat:last-child { border-right: none; }
+  .profil-stat-num {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: white;
+    margin-bottom: 2px;
+  }
+  .profil-stat-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Scroll body */
+  .profil-body {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding: 20px 24px 16px;
+  }
+  .profil-body::-webkit-scrollbar { display: none; }
+
+  /* Bio */
+  .section-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--night);
+    margin-bottom: 8px;
+  }
+  .bio-text {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.65;
+    background: var(--white);
+    border-radius: 14px;
+    padding: 14px;
+    border: 1px solid var(--gray-light);
+    margin-bottom: 20px;
+  }
+
+  /* Goûts */
+  .gouts-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .gout-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .gout-pill .gout-icon { font-size: 14px; }
+
+  /* Dernières sorties */
+  .sorties-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .sorties-row::-webkit-scrollbar { display: none; }
+  .sortie-card {
+    flex-shrink: 0;
+    width: 110px;
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--gray-light);
+  }
+  .sortie-img {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .sortie-info { padding: 8px 8px 10px; }
+  .sortie-name {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--night);
+    margin-bottom: 2px;
+    line-height: 1.3;
+  }
+  .sortie-date { font-size: 9.5px; color: var(--gray); }
+
+  /* Visibilité preview */
+  .visibility-preview {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 14px;
+    border: 1px solid var(--gray-light);
+    margin-bottom: 20px;
+  }
+  .visibility-preview-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .visibility-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green);
+  }
+  .visibility-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  .visibility-link {
+    font-size: 11px;
+    color: var(--coral);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .visibility-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-top: 1px solid var(--gray-light);
+  }
+  .visibility-row:first-of-type { border-top: none; padding-top: 0; }
+  .vis-icon { font-size: 15px; flex-shrink: 0; }
+  .vis-text { flex: 1; font-size: 12px; color: var(--night); font-weight: 500; }
+  .vis-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 10px;
+  }
+  .vis-on { background: var(--green-light); color: #16A34A; }
+  .vis-off { background: var(--gray-light); color: var(--gray); }
+  .vis-partial { background: var(--amber-light); color: #B45309; }
+
+  /* Profil vu par les autres — bandeau */
+  .pov-banner {
+    background: var(--purple-light);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .pov-banner svg { width: 16px; height: 16px; color: var(--purple); flex-shrink: 0; }
+  .pov-text { font-size: 11.5px; color: #5B21B6; line-height: 1.4; }
+  .pov-text strong { font-weight: 700; }
+
+  /* ================================
+     ÉCRAN 2 — PARAMÈTRES VISIBILITÉ
+  ================================ */
+  .screen-privacy .status-bar { background: var(--warm-white); color: var(--night); }
+  .screen-privacy .status-icons svg { fill: var(--night); }
+
+  .privacy-header {
+    background: var(--warm-white);
+    padding: 14px 24px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--gray-light);
+    flex-shrink: 0;
+  }
+  .privacy-header svg { width: 20px; height: 20px; color: var(--night); flex-shrink: 0; }
+  .privacy-header-text {}
+  .privacy-header-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--night);
+  }
+  .privacy-header-sub { font-size: 11.5px; color: var(--gray); }
+
+  .privacy-body {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding: 16px 24px 20px;
+  }
+  .privacy-body::-webkit-scrollbar { display: none; }
+
+  /* Privacy section */
+  .priv-section { margin-bottom: 24px; }
+  .priv-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--night);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .priv-section-title .priv-icon { font-size: 14px; }
+
+  /* Toggle row */
+  .toggle-row {
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--gray-light);
+    margin-bottom: 8px;
+  }
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--gray-light);
+  }
+  .toggle-item:last-child { border-bottom: none; }
+  .toggle-item-icon { font-size: 18px; flex-shrink: 0; }
+  .toggle-item-text { flex: 1; }
+  .toggle-item-label { font-size: 13px; font-weight: 600; color: var(--night); margin-bottom: 1px; }
+  .toggle-item-sub { font-size: 11px; color: var(--gray); line-height: 1.3; }
+
+  /* Toggle switch */
+  .toggle-switch {
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .toggle-switch.on { background: var(--green); }
+  .toggle-switch.off { background: var(--gray-light); }
+  .toggle-switch.partial { background: var(--amber); }
+  .toggle-knob {
+    position: absolute;
+    top: 3px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    transition: left 0.2s;
+  }
+  .toggle-switch.on .toggle-knob { left: 21px; }
+  .toggle-switch.off .toggle-knob { left: 3px; }
+  .toggle-switch.partial .toggle-knob { left: 12px; }
+
+  /* Audience selector */
+  .audience-select {
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--gray-light);
+    margin-bottom: 8px;
+  }
+  .audience-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gray-light);
+  }
+  .audience-item:last-child { border-bottom: none; }
+  .audience-radio {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--gray-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .audience-radio.selected { border-color: var(--coral); background: var(--coral); }
+  .audience-radio.selected::after {
+    content: '';
+    width: 7px; height: 7px;
+    background: white;
+    border-radius: 50%;
+  }
+  .audience-item-icon { font-size: 17px; flex-shrink: 0; }
+  .audience-item-text { flex: 1; }
+  .audience-item-label { font-size: 13px; font-weight: 600; color: var(--night); }
+  .audience-item-sub { font-size: 11px; color: var(--gray); }
+
+  /* Blocklist */
+  .block-row {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 13px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--gray-light);
+    margin-bottom: 8px;
+  }
+  .block-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .block-info { flex: 1; }
+  .block-name { font-size: 13px; font-weight: 600; color: var(--night); }
+  .block-reason { font-size: 11px; color: var(--gray); }
+  .block-remove {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--coral);
+    padding: 5px 10px;
+    border-radius: 10px;
+    background: var(--coral-light);
+  }
+
+  .add-block-btn {
+    background: transparent;
+    border: 1.5px dashed var(--gray-light);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gray);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .add-block-btn svg { width: 16px; height: 16px; }
+
+  /* Event override */
+  .event-override {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 13px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--gray-light);
+    margin-bottom: 8px;
+  }
+  .event-override-emoji { font-size: 20px; flex-shrink: 0; }
+  .event-override-info { flex: 1; }
+  .event-override-name { font-size: 13px; font-weight: 600; color: var(--night); }
+  .event-override-rule { font-size: 11px; color: var(--gray); }
+  .event-override-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 10px;
+  }
+  .override-hidden { background: var(--night); color: white; }
+  .override-buddies { background: var(--purple-light); color: var(--purple); }
+
+  /* Bottom nav */
+  .bottom-nav {
+    background: var(--white);
+    border-top: 1px solid var(--gray-light);
+    padding: 10px 0 24px;
+    display: flex;
+    justify-content: space-around;
+    flex-shrink: 0;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 14px; position: relative; }
+  .nav-item svg { width: 22px; height: 22px; color: var(--gray); }
+  .nav-item.active svg { color: var(--coral); }
+  .nav-label { font-size: 10px; font-weight: 500; color: var(--gray); }
+  .nav-item.active .nav-label { color: var(--coral); font-weight: 600; }
+  .nav-dot { width: 4px; height: 4px; background: var(--coral); border-radius: 50%; position: absolute; bottom: -2px; }
+</style>
+</head>
+<body>
+
+<!-- ====== ÉCRAN 1 : MON PROFIL ====== -->
+<div class="phone-wrap">
+  <div class="phone-label">① Mon profil</div>
+  <div class="phone screen-profil">
+
+    <div class="status-bar">
+      <span class="time">20:14</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="profil-hero">
+      <div class="profil-hero-topbar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </div>
+
+      <div class="profil-identity">
+        <div class="profil-avatar-wrap">
+          <div class="profil-avatar">T</div>
+          <div class="profil-avatar-add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="profil-id-info">
+          <div class="profil-name">Thomas</div>
+          <div class="profil-location">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            Nantes, Loire-Atlantique
+          </div>
+          <div class="profil-member-since">Membre depuis mars 2025</div>
+        </div>
+      </div>
+
+      <div class="profil-stats">
+        <div class="profil-stat">
+          <div class="profil-stat-num">23</div>
+          <div class="profil-stat-label">Sorties</div>
+        </div>
+        <div class="profil-stat">
+          <div class="profil-stat-num">8</div>
+          <div class="profil-stat-label">Buddies</div>
+        </div>
+        <div class="profil-stat">
+          <div class="profil-stat-num">2</div>
+          <div class="profil-stat-label">Groupes</div>
+        </div>
+        <div class="profil-stat">
+          <div class="profil-stat-num">4.8★</div>
+          <div class="profil-stat-label">Note moy.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="profil-body">
+
+      <!-- Bandeau vue des autres -->
+      <div class="pov-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <div class="pov-text">Voici ce que les autres voient quand ils consultent ton profil depuis un event. <strong>Tu choisis ce que tu montres.</strong></div>
+      </div>
+
+      <!-- Bio -->
+      <div class="section-title">À propos de moi</div>
+      <div class="bio-text">
+        Fan de théâtre et d'impro, toujours partant pour un concert de jazz ou une expo décalée. J'aime découvrir des endroits insolites à Nantes. Souvent dispo le soir en semaine 🌆
+      </div>
+
+      <!-- Goûts -->
+      <div class="section-title">Mes centres d'intérêt</div>
+      <div class="gouts-grid">
+        <div class="gout-pill" style="background:var(--coral-light);color:var(--coral);">
+          <span class="gout-icon">🎭</span> Théâtre
+        </div>
+        <div class="gout-pill" style="background:#EDE9FE;color:var(--purple);">
+          <span class="gout-icon">🎵</span> Concerts
+        </div>
+        <div class="gout-pill" style="background:var(--green-light);color:#16A34A;">
+          <span class="gout-icon">🎲</span> Jeux de société
+        </div>
+        <div class="gout-pill" style="background:var(--amber-light);color:#B45309;">
+          <span class="gout-icon">🏛️</span> Histoire
+        </div>
+        <div class="gout-pill" style="background:#E0F2FE;color:#0369A1;">
+          <span class="gout-icon">🌿</span> Marchés
+        </div>
+      </div>
+
+      <!-- Dernières sorties -->
+      <div class="section-title">Mes dernières sorties</div>
+      <div class="sorties-row">
+        <div class="sortie-card">
+          <div class="sortie-img" style="background: linear-gradient(135deg,#1A1A2E,#2D2B55);">🎭</div>
+          <div class="sortie-info">
+            <div class="sortie-name">Impromptus du Jeudi</div>
+            <div class="sortie-date">22 juin</div>
+          </div>
+        </div>
+        <div class="sortie-card">
+          <div class="sortie-img" style="background: linear-gradient(135deg,#065F46,#10B981);">🌿</div>
+          <div class="sortie-info">
+            <div class="sortie-name">Marché Racines</div>
+            <div class="sortie-date">15 juin</div>
+          </div>
+        </div>
+        <div class="sortie-card">
+          <div class="sortie-img" style="background: linear-gradient(135deg,#1D4ED8,#7C3AED);">🎵</div>
+          <div class="sortie-info">
+            <div class="sortie-name">Jazz Session</div>
+            <div class="sortie-date">8 juin</div>
+          </div>
+        </div>
+        <div class="sortie-card">
+          <div class="sortie-img" style="background: linear-gradient(135deg,#92400E,#D97706);">🏛️</div>
+          <div class="sortie-info">
+            <div class="sortie-name">Médiéval Château</div>
+            <div class="sortie-date">1 juin</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visibilité rapide -->
+      <div class="section-title">Ma visibilité</div>
+      <div class="visibility-preview">
+        <div class="visibility-preview-top">
+          <div class="visibility-status">
+            <div class="visibility-dot"></div>
+            Profil visible
+          </div>
+          <div class="visibility-link" id="__vis_manage_btn">Gérer →</div>
+        </div>
+        <div class="visibility-row" data-vis-target="events">
+          <span class="vis-icon">👥</span>
+          <span class="vis-text">Qui me voit sur les events</span>
+          <span class="vis-badge vis-on">Tous</span>
+        </div>
+        <div class="visibility-row" data-vis-target="agenda">
+          <span class="vis-icon">📅</span>
+          <span class="vis-text">Mon agenda partagé</span>
+          <span class="vis-badge vis-partial">Buddies seuls</span>
+        </div>
+        <div class="visibility-row" data-vis-target="blocked">
+          <span class="vis-icon">🔒</span>
+          <span class="vis-text">Personnes bloquées</span>
+          <span class="vis-badge vis-off">1 personne</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom nav -->
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z"/></svg>
+        <span class="nav-label">Accueil</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span class="nav-label">Explorer</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-label">Agenda</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <span class="nav-label">Messages</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== ÉCRAN 2 : PARAMÈTRES VISIBILITÉ ====== -->
+<div class="phone-wrap">
+  <div class="phone-label">② Gérer ma visibilité</div>
+  <div class="phone screen-privacy">
+
+    <div class="status-bar">
+      <span class="time" style="color:var(--night);">20:14</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24" fill="var(--night)"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+        <svg viewBox="0 0 24 24" fill="var(--night)"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+      </div>
+    </div>
+
+    <div class="privacy-header">
+      <svg class="privacy-back-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      <div class="privacy-header-text">
+        <div class="privacy-header-title">Ma visibilité</div>
+        <div class="privacy-header-sub">Tu contrôles qui te voit et où</div>
+      </div>
+    </div>
+
+    <div class="privacy-body">
+
+      <!-- Visibilité générale -->
+      <div class="priv-section" id="__priv_general">
+        <div class="priv-section-title"><span class="priv-icon">🌍</span> Visibilité générale</div>
+        <div class="toggle-row">
+          <div class="toggle-item">
+            <span class="toggle-item-icon">👤</span>
+            <div class="toggle-item-text">
+              <div class="toggle-item-label">Profil visible</div>
+              <div class="toggle-item-sub">Les autres peuvent voir ton profil depuis un event</div>
+            </div>
+            <div class="toggle-switch on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-item">
+            <span class="toggle-item-icon">🙋</span>
+            <div class="toggle-item-text">
+              <div class="toggle-item-label">Apparaître sur les events</div>
+              <div class="toggle-item-sub">Ton avatar est visible dans "Qui y va ?"</div>
+            </div>
+            <div class="toggle-switch on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-item">
+            <span class="toggle-item-icon">📍</span>
+            <div class="toggle-item-text">
+              <div class="toggle-item-label">Afficher ma ville</div>
+              <div class="toggle-item-sub">Nantes affiché sur ton profil public</div>
+            </div>
+            <div class="toggle-switch on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-item">
+            <span class="toggle-item-icon">🕐</span>
+            <div class="toggle-item-text">
+              <div class="toggle-item-label">Afficher "Actif il y a…"</div>
+              <div class="toggle-item-sub">Masquer ta dernière connexion</div>
+            </div>
+            <div class="toggle-switch off"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Qui peut me contacter -->
+      <div class="priv-section" id="__priv_agenda">
+        <div class="priv-section-title"><span class="priv-icon">✉️</span> Qui peut m'envoyer un message ?</div>
+        <div class="audience-select">
+          <div class="audience-item">
+            <div class="audience-radio"></div>
+            <span class="audience-item-icon">🌍</span>
+            <div class="audience-item-text">
+              <div class="audience-item-label">Tout le monde</div>
+              <div class="audience-item-sub">N'importe quel utilisateur sur le même event</div>
+            </div>
+          </div>
+          <div class="audience-item">
+            <div class="audience-radio selected"></div>
+            <span class="audience-item-icon">🎟️</span>
+            <div class="audience-item-text">
+              <div class="audience-item-label">Participants au même event</div>
+              <div class="audience-item-sub">Seulement les gens qui vont au même event que toi</div>
+            </div>
+          </div>
+          <div class="audience-item">
+            <div class="audience-radio"></div>
+            <span class="audience-item-icon">👥</span>
+            <div class="audience-item-text">
+              <div class="audience-item-label">Mes Buddies uniquement</div>
+              <div class="audience-item-sub">Seuls tes Buddies acceptés peuvent t'écrire</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exceptions par event -->
+      <div class="priv-section">
+        <div class="priv-section-title"><span class="priv-icon">🎭</span> Exceptions par event</div>
+        <div class="event-override">
+          <span class="event-override-emoji">🎵</span>
+          <div class="event-override-info">
+            <div class="event-override-name">Jazz Session — 4 juillet</div>
+            <div class="event-override-rule">Masqué sur cet event uniquement</div>
+          </div>
+          <span class="event-override-badge override-hidden">Masqué</span>
+        </div>
+        <div class="event-override">
+          <span class="event-override-emoji">🌿</span>
+          <div class="event-override-info">
+            <div class="event-override-name">Marché Racines — 5 juillet</div>
+            <div class="event-override-rule">Visible Buddies seulement</div>
+          </div>
+          <span class="event-override-badge override-buddies">Buddies</span>
+        </div>
+        <div class="add-block-btn" style="margin-top:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Ajouter une exception
+        </div>
+      </div>
+
+      <!-- Personnes bloquées -->
+      <div class="priv-section" id="__priv_blocked">
+        <div class="priv-section-title"><span class="priv-icon">🚫</span> Personnes masquées</div>
+        <div class="block-row">
+          <div class="block-avatar" style="background:var(--gray);">X</div>
+          <div class="block-info">
+            <div class="block-name">Utilisateur inconnu</div>
+            <div class="block-reason">Ne voit pas ton profil ni tes events</div>
+          </div>
+          <div class="block-remove">Débloquer</div>
+        </div>
+        <div class="add-block-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Masquer une personne
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+/* OM_NAV_WIRED */
+(function(){
+  var MAP = {"Accueil":"Accueil.dc.html","Explorer":"Explorer.dc.html","Agenda":"Agenda.dc.html","Messages":"Messages-Liste.dc.html"};
+  function omnav(file){
+    try { window.parent && window.parent.postMessage({type:'omnav', file:file}, '*'); } catch(e){}
+  }
+  window.__omnav = omnav;
+  document.querySelectorAll('.nav-item').forEach(function(it){
+    var lbl = it.querySelector('.nav-label');
+    if(!lbl) return;
+    var target = MAP[lbl.textContent.trim()];
+    if(!target) return;
+    it.style.cursor = 'pointer';
+    it.addEventListener('click', function(){ omnav(target); });
+  });
+})();
+</script>
+
+<script>
+/* OM_ACT3_WIRED */
+(function(){
+  function omnav(file){ try{ (window.parent||window).postMessage({type:'omnav',file:file},'*'); }catch(e){} }
+  var acts = [['.hero-edit-btn','Modifier-Profil.dc.html']];
+  acts.forEach(function(pair){
+    document.querySelectorAll(pair[0]).forEach(function(el){
+      el.style.cursor='pointer';
+      el.addEventListener('click', function(ev){ ev.stopPropagation(); omnav(pair[1]); });
+    });
+  });
+  // Add a settings gear button next to the edit button if not present
+  var topbar = document.querySelector('.profil-hero-topbar');
+  if (topbar && !topbar.querySelector('.settings-gear-btn')) {
+    var gear = document.createElement('div');
+    gear.className = 'settings-gear-btn';
+    gear.style.cssText = 'margin-left:8px; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.16); display:flex; align-items:center; justify-content:center; cursor:pointer;';
+    gear.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+    gear.addEventListener('click', function(ev){ ev.stopPropagation(); omnav('Parametres.dc.html'); });
+    topbar.appendChild(gear);
+  }
+})();
+</script>
+
+<script>
+/* OM_TOGGLE_WIRED */
+(function(){
+  document.querySelectorAll('.toggle-switch').forEach(function(sw){
+    sw.style.cursor = 'pointer';
+    sw.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      if (sw.classList.contains('on')) { sw.classList.remove('on'); sw.classList.add('off'); }
+      else { sw.classList.remove('off','partial'); sw.classList.add('on'); }
+    });
+  });
+  // audience selector chips (if any) - make clickable toggle active state
+  document.querySelectorAll('.audience-option, .audience-chip').forEach(function(el){
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      var siblings = el.parentElement ? el.parentElement.children : [];
+      for (var i=0;i<siblings.length;i++) siblings[i].classList.remove('active','selected');
+      el.classList.add('active');
+      el.classList.add('selected');
+    });
+  });
+})();
+</script>
+<script>
+/* OM_VIS_TOGGLE */
+(function(){
+  var wraps = document.querySelectorAll('.phone-wrap');
+  var wrap1 = wraps[0], wrap2 = wraps[1];
+  function omnav(file){ try{ (window.parent||window).postMessage({type:'omnav',file:file},'*'); }catch(e){} }
+  function showManage(anchorId){
+    if (!wrap2) return;
+    wrap1.style.display = 'none';
+    wrap2.style.display = 'flex';
+    if (anchorId) {
+      var el = document.getElementById(anchorId);
+      var scrollArea = wrap2.querySelector('.privacy-body');
+      if (el && scrollArea) { scrollArea.scrollTop = el.offsetTop - 10; }
+    }
+  }
+  function showProfile(){
+    wrap1.style.display = 'flex';
+    if (wrap2) wrap2.style.display = 'none';
+  }
+  var manageBtn = document.getElementById('__vis_manage_btn');
+  if (manageBtn) manageBtn.addEventListener('click', function(){ showManage(null); });
+  document.querySelectorAll('.visibility-row').forEach(function(row){
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', function(){
+      var t = row.getAttribute('data-vis-target');
+      var anchor = t === 'events' ? '__priv_general' : (t === 'agenda' ? '__priv_agenda' : '__priv_blocked');
+      showManage(anchor);
+    });
+  });
+  var backBtn = document.querySelector('.privacy-back-btn');
+  if (backBtn) { backBtn.style.cursor = 'pointer'; backBtn.addEventListener('click', showProfile); }
+  var profileBackBtn = document.querySelector('.screen-profil .profil-hero-topbar svg');
+  if (profileBackBtn) {
+    profileBackBtn.style.cursor = 'pointer';
+    profileBackBtn.parentElement.style.cursor = 'pointer';
+    profileBackBtn.addEventListener('click', function(ev){ ev.stopPropagation(); omnav('Accueil.dc.html'); });
+  }
+  if (location.hash === '#gerer') showManage(null);
+  else showProfile();
+})();
+</script>
+</body>
+</html>

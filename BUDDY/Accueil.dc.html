@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #E8E4DF; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 24px 16px; }
+  .hm-scroll::-webkit-scrollbar { display: none; }
+  .hm-row { scroll-snap-type: x proximity; scroll-padding-left: 24px; }
+  .hm-row > * { scroll-snap-align: start; }
+  .hm-row::after { content: ''; flex: 0 0 10px; }
+</style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#F7F4F0; border-radius:48px; overflow:hidden; position:relative; box-shadow:0 32px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08); display:flex; flex-direction:column;">
+
+  <!-- Status bar -->
+  <div style="background:#1A1A2E; padding:14px 28px 0; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+    <span style="font-weight:600; font-size:15px; color:#fff;">20:14</span>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+    </div>
+  </div>
+
+  <!-- Scroll body -->
+  <div class="hm-scroll" style="flex:1; overflow-y:auto; background:#F7F4F0;">
+
+    <!-- ============ HERO ============ -->
+    <div style="position:relative; padding:16px 24px 22px; background:#1A1A2E;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <div>
+          <div onClick="{{ onOpenCity }}" style="display:inline-flex; align-items:center; gap:5px; font-size:12px; color:rgba(255,255,255,0.6); font-weight:500; margin-bottom:3px; cursor:pointer;">
+            <span>Mercredi 2 juillet ·</span>
+            <span style="display:inline-flex; align-items:center; gap:3px; color:#fff; font-weight:600;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#FF5C57"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              {{ city }}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </div>
+          <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:24px; color:#fff; letter-spacing:-0.5px;">Salut Thomas 👋</div>
+        </div>
+        <div onClick="{{ navMoi }}" style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#FF5C57,#FF8A7A); display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:16px; color:#fff; position:relative; cursor:pointer; flex-shrink:0;">
+          T
+          <div style="position:absolute; bottom:-2px; right:-2px; width:19px; height:19px; background:#E5E2DE; border-radius:50%; border:2px solid #F7F4F0; display:flex; align-items:center; justify-content:center;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          </div>
+        </div>
+
+        <!-- Account menu popover -->
+        <sc-if value="{{ accountMenuOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ onCloseAccountMenu }}" style="position:fixed; inset:0; z-index:59;"></div>
+          <div style="position:absolute; top:52px; right:0; z-index:60; background:#fff; border-radius:16px; box-shadow:0 12px 32px rgba(0,0,0,0.25); padding:6px; width:230px;">
+            <div onClick="{{ onOpenEditProfile }}" style="display:flex; align-items:center; gap:11px; padding:11px 12px; border-radius:11px; cursor:pointer;">
+              <div style="width:32px; height:32px; border-radius:9px; background:#FFE8E7; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px;">✏️</div>
+              <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; color:#1A1A2E;">Modifier mon profil</div>
+            </div>
+            <div onClick="{{ onOpenVisibility }}" style="display:flex; align-items:center; gap:11px; padding:11px 12px; border-radius:11px; cursor:pointer;">
+              <div style="width:32px; height:32px; border-radius:9px; background:#F1EBFE; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px;">👁️</div>
+              <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; color:#1A1A2E;">Visibilité de mon profil</div>
+            </div>
+            <div style="height:1px; background:#F2EFEA; margin:4px 6px;"></div>
+            <div onClick="{{ onOpenSettings }}" style="display:flex; align-items:center; gap:11px; padding:11px 12px; border-radius:11px; cursor:pointer;">
+              <div style="width:32px; height:32px; border-radius:9px; background:#ECEBF0; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px;">⚙️</div>
+              <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; color:#1A1A2E;">Paramètres</div>
+            </div>
+            <div onClick="{{ onOpenFaq }}" style="display:flex; align-items:center; gap:11px; padding:11px 12px; border-radius:11px; cursor:pointer;">
+              <div style="width:32px; height:32px; border-radius:9px; background:#DCFCE7; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px;">❓</div>
+              <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; color:#1A1A2E;">FAQ &amp; aide</div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- Featured card -->
+      <div style="position:relative; border-radius:22px; overflow:hidden; height:230px; display:flex; flex-direction:column; justify-content:flex-end; background:#1D4ED8;">
+        <img src="https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?auto=format&fit=crop&w=900&q=75" alt="Jazz Session" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.15) 65%);"></div>
+        <div style="position:relative; padding:18px 20px 20px;">
+          <span style="display:inline-flex; align-items:center; gap:5px; background:#FF5C57; color:#fff; font-size:11px; font-weight:700; padding:5px 11px; border-radius:20px; margin-bottom:10px;">🔥 Coup de cœur ce soir</span>
+          <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#fff; line-height:1.15; margin-bottom:6px;">Jazz Session — Duo Moreau &amp; Fils</div>
+          <div style="font-size:12.5px; color:rgba(255,255,255,0.8); margin-bottom:14px;">21h00 · L'Univers · 3,4 km · 8 €</div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div onClick="{{ heroGo }}" style="background:#fff; color:#1A1A2E; font-family:'Poppins',sans-serif; font-weight:700; font-size:13px; padding:11px 20px; border-radius:14px; cursor:pointer;">J'y vais</div>
+            <div onClick="{{ heroQui }}" style="background:rgba(255,255,255,0.16); backdrop-filter:blur(4px); color:#fff; font-weight:600; font-size:13px; padding:11px 18px; border-radius:14px; display:flex; align-items:center; gap:6px; cursor:pointer;">👋 Qui vient ?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ROWS ============ -->
+    <div style="padding:22px 0 20px;">
+      <sc-for list="{{ rows }}" as="row" hint-placeholder-count="4">
+        <div style="margin-bottom:26px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; padding:0 24px; margin-bottom:14px;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color:#1A1A2E; letter-spacing:-0.3px;">{{ row.title }}</div>
+            <span onClick="{{ navExplorer }}" style="font-size:12px; font-weight:600; color:#FF5C57; cursor:pointer;">Tout voir</span>
+          </div>
+
+          <!-- CATEGORY PILLS ROW -->
+          <sc-if value="{{ row.isCategories }}" hint-placeholder-val="{{ false }}">
+            <div class="hm-scroll hm-row" style="display:flex; gap:12px; overflow-x:auto; padding:2px 24px;">
+              <sc-for list="{{ row.cats }}" as="cat" hint-placeholder-count="5">
+                <div onClick="{{ cat.onClick }}" style="{{ cat.style }}">
+                  <div style="font-size:30px; margin-bottom:8px;">{{ cat.emoji }}</div>
+                  <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13px; color:#fff;">{{ cat.label }}</div>
+                  <div style="font-size:10.5px; color:rgba(255,255,255,0.75); margin-top:2px;">{{ cat.count }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <!-- BUDDY ROW (wide social cards) -->
+          <sc-if value="{{ row.isBuddy }}" hint-placeholder-val="{{ false }}">
+            <div class="hm-scroll hm-row" style="display:flex; gap:14px; overflow-x:auto; padding:2px 24px;">
+              <sc-for list="{{ row.items }}" as="e" hint-placeholder-count="3">
+                <div style="flex-shrink:0; width:280px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+                  <div style="position:relative; height:110px; overflow:hidden; background:{{ e.imgBg }};">
+                    <img src="{{ e.img }}" alt="{{ e.title }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" />
+                    <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 55%);"></div>
+                    <div style="position:absolute; top:10px; left:10px; display:flex; align-items:center; gap:7px; background:rgba(26,26,46,0.62); backdrop-filter:blur(4px); padding:5px 11px 5px 5px; border-radius:20px;">
+                      <div style="width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; background:{{ e.buddyColor }};">{{ e.buddyInitial }}</div>
+                      <span style="font-size:11px; font-weight:600; color:#fff;">{{ e.buddyAction }}</span>
+                    </div>
+                  </div>
+                  <div style="padding:12px 14px 14px;">
+                    <div onClick="{{ e.onOpen }}" style="font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#1A1A2E; margin-bottom:5px; line-height:1.25; cursor:pointer;">{{ e.title }}</div>
+                    <div style="font-size:11.5px; color:#6B7280; margin-bottom:12px;">{{ e.meta }}</div>
+                    <div style="display:flex; gap:8px;">
+                      <div onClick="{{ e.onJoin }}" style="flex:1; text-align:center; background:#FF5C57; color:#fff; font-family:'Poppins',sans-serif; font-weight:700; font-size:12px; padding:9px; border-radius:11px; cursor:pointer;">Rejoindre</div>
+                      <div style="width:40px; text-align:center; background:#F7F4F0; border:1.5px solid #E5E2DE; color:#6B7280; font-size:14px; padding:9px 0; border-radius:11px;">💬</div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <!-- POSTER ROW (default) -->
+          <sc-if value="{{ row.isPoster }}" hint-placeholder-val="{{ true }}">
+            <div class="hm-scroll hm-row" style="display:flex; gap:14px; overflow-x:auto; padding:2px 24px;">
+              <sc-for list="{{ row.items }}" as="e" hint-placeholder-count="4">
+                <div onClick="{{ e.onOpen }}" style="flex-shrink:0; width:150px; cursor:pointer;">
+                  <div style="position:relative; height:196px; border-radius:18px; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end; background:{{ e.imgBg }}; box-shadow:0 4px 14px rgba(0,0,0,0.12);">
+                    <img src="{{ e.img }}" alt="{{ e.title }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" />
+                    <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0) 58%);"></div>
+                    <div style="{{ e.badgeStyle }}">{{ e.badge }}</div>
+                    <div style="position:relative; padding:10px 12px 12px;">
+                      <div style="font-size:10px; font-weight:600; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">{{ e.tag }}</div>
+                      <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#fff; line-height:1.2;">{{ e.title }}</div>
+                    </div>
+                  </div>
+                  <div style="padding:8px 2px 0;">
+                    <div style="font-size:12px; color:#1A1A2E; font-weight:600; margin-bottom:2px;">{{ e.when }}</div>
+                    <div style="font-size:11px; color:#6B7280; display:flex; align-items:center; gap:4px;">📍 {{ e.place }} · {{ e.dist }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+        </div>
+      </sc-for>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div style="background:#fff; border-top:1px solid #E5E2DE; padding:10px 0 24px; display:flex; justify-content:space-around; flex-shrink:0;">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 16px; position:relative;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#FF5C57" stroke="#FF5C57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z"/></svg>
+      <span style="font-size:10px; font-weight:600; color:#FF5C57;">Accueil</span>
+      <div style="width:4px; height:4px; background:#FF5C57; border-radius:50%; position:absolute; bottom:-2px;"></div>
+    </div>
+    <div onClick="{{ navExplorer }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 16px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Explorer</span>
+    </div>
+    <div onClick="{{ navAgenda }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 16px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Agenda</span>
+    </div>
+    <div onClick="{{ navMessages }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 16px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Messages</span>
+    </div>
+  </div>
+
+  <!-- ============ CITY PICKER ============ -->
+  <sc-if value="{{ cityOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseCity }}" style="position:absolute; inset:0; z-index:40; background:rgba(26,26,46,0.5); backdrop-filter:blur(2px); display:flex; flex-direction:column; justify-content:flex-end;">
+      <div style="background:#F7F4F0; border-radius:28px 28px 0 0; padding:8px 0 28px; box-shadow:0 -8px 40px rgba(0,0,0,0.2);">
+        <div style="width:40px; height:5px; border-radius:3px; background:#D6D0C8; margin:8px auto 6px;"></div>
+        <div style="padding:10px 24px 14px; font-family:'Poppins',sans-serif; font-weight:700; font-size:19px; color:#1A1A2E;">Votre ville</div>
+        <div style="padding:0 24px 14px;">
+          <div style="background:#fff; border-radius:14px; padding:11px 15px; display:flex; align-items:center; gap:9px; border:1.5px solid #E5E2DE;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input value="{{ citySearch }}" onInput="{{ onCitySearch }}" placeholder="Rechercher une ville…" style="flex:1; background:transparent; border:none; outline:none; font-size:13.5px; color:#1A1A2E;" />
+          </div>
+        </div>
+        <div style="padding:0 16px 6px;">
+          <div onClick="{{ onUseLocation }}" style="display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:16px; cursor:pointer; background:#FFE8E7;">
+            <div style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; background:#fff;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF5C57" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; color:#FF5C57;">{{ locationLabel }}</div>
+              <div style="font-size:11px; color:#6B7280;">Utiliser ma position actuelle</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:6px 16px 0;">
+          <sc-for list="{{ cities }}" as="c" hint-placeholder-count="6">
+            <div onClick="{{ c.onSelect }}" style="{{ c.rowStyle }}">
+              <div style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; background:{{ c.iconBg }};">📍</div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E;">{{ c.name }}</div>
+                <div style="font-size:11.5px; color:#6B7280;">{{ c.count }}</div>
+              </div>
+              <sc-if value="{{ c.active }}" hint-placeholder-val="{{ false }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF5C57" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+
+    const G = { theatre:'linear-gradient(150deg,#1A1A2E,#2D2B55)', jazz:'linear-gradient(150deg,#1D4ED8,#7C3AED)',
+      plant:'linear-gradient(150deg,#065F46,#10B981)', games:'linear-gradient(150deg,#166534,#22C55E)',
+      histo:'linear-gradient(150deg,#92400E,#D97706)', expo:'linear-gradient(150deg,#BE185D,#F97316)',
+      film:'linear-gradient(150deg,#0F172A,#475569)', dance:'linear-gradient(150deg,#DB2777,#8B5CF6)' };
+
+    const P = {
+      theatre:'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=800&q=70',
+      jazz:'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?auto=format&fit=crop&w=800&q=70',
+      plant:'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=800&q=70',
+      games:'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=800&q=70',
+      histo:'https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?auto=format&fit=crop&w=800&q=70',
+      expo:'https://images.unsplash.com/photo-1544967082-d9d25d867d66?auto=format&fit=crop&w=800&q=70',
+      dance:'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=800&q=70' };
+
+    // Que faire cette semaine
+    this.WEEK = [
+      { emoji:'🎭', img:P.theatre, imgBg:G.theatre, tag:'Théâtre', title:'Les Impromptus du Jeudi', when:'Jeu. 20h30', place:'Le Ferrailleur', dist:'1,2 km', badge:'Gratuit', free:true },
+      { emoji:'🎲', img:P.games, imgBg:G.games, tag:'Jeux', title:'Soirée jeux coopératifs', when:'Ven. 19h30', place:'Le Repaire', dist:'0,9 km', badge:'5 €', free:false },
+      { emoji:'🎨', img:P.expo, imgBg:G.expo, tag:'Expo', title:'Nuit des galeries', when:'Sam. 18h00', place:'Quartier Bouffay', dist:'1,5 km', badge:'Gratuit', free:true },
+      { emoji:'💃', img:P.dance, imgBg:G.dance, tag:'Danse', title:'Bal folk en plein air', when:'Sam. 20h00', place:'Île de Nantes', dist:'2,8 km', badge:'Gratuit', free:true },
+      { emoji:'🏛️', img:P.histo, imgBg:G.histo, tag:'Histoire', title:'Visite nocturne du Château', when:'Dim. 20h00', place:'Château des Ducs', dist:'2,1 km', badge:'12 €', free:false },
+    ];
+
+    // Vos évènements à venir
+    this.UPCOMING = [
+      { emoji:'🎭', img:P.theatre, imgBg:G.theatre, tag:'J\'y vais', title:'Les Impromptus du Jeudi', when:'Dans 2 jours', place:'Le Ferrailleur', dist:'1,2 km', badge:'✓', going:true },
+      { emoji:'🌿', img:P.plant, imgBg:G.plant, tag:'J\'y vais', title:'Vente de plantes — Racines', when:'Sam. 17h00', place:'Bouffay', dist:'0,8 km', badge:'✓', going:true },
+      { emoji:'🎵', img:P.jazz, imgBg:G.jazz, tag:'Envie', title:'Jazz Session — Duo Moreau', when:'Ven. 21h00', place:"L'Univers", dist:'3,4 km', badge:'♡', going:false },
+    ];
+
+    // Les évènements de vos buddies
+    this.BUDDIES = [
+      { img:P.jazz, imgBg:G.jazz, buddyInitial:'L', buddyColor:'#8B5CF6', buddyAction:'Léa cherche du monde', title:'Jazz Session — Duo Moreau', meta:'Ven. 21h00 · L\'Univers · 3,4 km' },
+      { img:P.games, imgBg:G.games, buddyInitial:'M', buddyColor:'#FF5C57', buddyAction:'Marc y va', title:'Soirée jeux coopératifs', meta:'Ven. 19h30 · Le Repaire · 0,9 km' },
+      { img:P.histo, imgBg:G.histo, buddyInitial:'T', buddyColor:'#22C55E', buddyAction:'Tom est intéressé', title:'Visite nocturne du Château', meta:'Dim. 20h00 · Château des Ducs · 2,1 km' },
+    ];
+
+    // Gratuit près de chez vous
+    this.FREE = [
+      { emoji:'🌿', img:P.plant, imgBg:G.plant, tag:'Marché', title:'Vente de plantes — Racines', when:'Sam. 17h00', place:'Bouffay', dist:'0,8 km', badge:'Gratuit', free:true },
+      { emoji:'🎨', img:P.expo, imgBg:G.expo, tag:'Expo', title:'Nuit des galeries', when:'Sam. 18h00', place:'Bouffay', dist:'1,5 km', badge:'Gratuit', free:true },
+      { emoji:'🎭', img:P.theatre, imgBg:G.theatre, tag:'Théâtre', title:'Les Impromptus du Jeudi', when:'Jeu. 20h30', place:'Le Ferrailleur', dist:'1,2 km', badge:'Gratuit', free:true },
+      { emoji:'💃', img:P.dance, imgBg:G.dance, tag:'Danse', title:'Bal folk en plein air', when:'Sam. 20h00', place:'Île de Nantes', dist:'2,8 km', badge:'Gratuit', free:true },
+    ];
+
+    this.CATS = [
+      { emoji:'🎵', label:'Concerts', count:'32 events', bg:'linear-gradient(150deg,#1D4ED8,#7C3AED)' },
+      { emoji:'🎭', label:'Théâtre', count:'18 events', bg:'linear-gradient(150deg,#1A1A2E,#2D2B55)' },
+      { emoji:'🎲', label:'Jeux', count:'11 events', bg:'linear-gradient(150deg,#166534,#22C55E)' },
+      { emoji:'🎨', label:'Expos', count:'24 events', bg:'linear-gradient(150deg,#BE185D,#F97316)' },
+      { emoji:'🌿', label:'Marchés', count:'9 events', bg:'linear-gradient(150deg,#065F46,#10B981)' },
+      { emoji:'🏛️', label:'Histoire', count:'7 events', bg:'linear-gradient(150deg,#92400E,#D97706)' },
+    ];
+
+    this.CITIES = [
+      { name:'Nantes',   count:'128 events cette semaine' },
+      { name:'Rennes',   count:'94 events cette semaine' },
+      { name:'Angers',   count:'61 events cette semaine' },
+      { name:'Bordeaux', count:'176 events cette semaine' },
+      { name:'Paris',    count:'420 events cette semaine' },
+      { name:'Lyon',     count:'203 events cette semaine' },
+    ];
+
+    this.state = { city:'Nantes', cityOpen:false, citySearch:'', usingLocation:false };
+  }
+
+  nav(file){ try { (window.parent||window).postMessage({type:'omnav', file:file}, '*'); } catch(err){} }
+
+  poster(e){
+    let badgeStyle = 'position:absolute; top:10px; left:10px; font-size:10px; font-weight:700; padding:4px 9px; border-radius:8px; z-index:2; ';
+    if (e.badge === '✓') badgeStyle += 'background:#22C55E; color:#fff; width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0; border-radius:50%; font-size:12px;';
+    else if (e.badge === '♡') badgeStyle += 'background:rgba(255,255,255,0.9); color:#FF5C57; width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0; border-radius:50%; font-size:13px;';
+    else if (e.free) badgeStyle += 'background:#22C55E; color:#fff;';
+    else badgeStyle += 'background:rgba(255,255,255,0.92); color:#1A1A2E;';
+    return { emoji:e.emoji, img:e.img, imgBg:e.imgBg, tag:e.tag, title:e.title, when:e.when, place:e.place, dist:e.dist, badge:e.badge, badgeStyle, onOpen:()=>this.nav('uploads/buddy-design-kit/03-fiche-event.html') };
+  }
+
+  renderVals(){
+    const posterRow = (title, arr) => ({ title, isPoster:true, isBuddy:false, isCategories:false, items: arr.map(e=>this.poster(e)) });
+
+    const rows = [
+      posterRow('Que faire cette semaine ?', this.WEEK),
+      posterRow('Vos évènements à venir', this.UPCOMING),
+      { title:'Les évènements de vos buddies', isPoster:false, isBuddy:true, isCategories:false, items:this.BUDDIES.map(b=>Object.assign({}, b, { onJoin:()=>this.nav('uploads/buddy-design-kit/05-flow-appel-complet.html'), onOpen:()=>this.nav('uploads/buddy-design-kit/03-fiche-event.html') })) },
+      posterRow('Gratuit près de chez vous', this.FREE),
+      { title:'Explorer par catégorie', isPoster:false, isBuddy:false, isCategories:true,
+        cats: this.CATS.map(c=>({ emoji:c.emoji, label:c.label, count:c.count, onClick:()=>this.nav('Explorer.dc.html'),
+          style:'flex-shrink:0; width:130px; height:118px; border-radius:18px; padding:16px 14px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; cursor:pointer; background:'+c.bg+'; box-shadow:0 4px 14px rgba(0,0,0,0.12);' })) },
+    ];
+
+    const q = this.state.citySearch.trim().toLowerCase();
+    const filteredCities = q ? this.CITIES.filter(c=>c.name.toLowerCase().includes(q)) : this.CITIES;
+    const cities = filteredCities.map(c=>{
+      const active = c.name === this.state.city && !this.state.usingLocation;
+      return {
+        name:c.name, count:c.count, active,
+        iconBg: active ? '#FFE8E7' : '#EDE9E3',
+        rowStyle: 'display:flex; align-items:center; gap:12px; padding:12px 12px; border-radius:16px; cursor:pointer; margin-bottom:2px; '
+          + (active ? 'background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.05);' : 'background:transparent;'),
+        onSelect: () => this.setState({ city:c.name, cityOpen:false, usingLocation:false, citySearch:'' }),
+      };
+    });
+
+    return {
+      rows,
+      city: this.state.city,
+      cityOpen: this.state.cityOpen,
+      cities,
+      onOpenCity: () => this.setState({ cityOpen:true }),
+      onCloseCity: () => this.setState({ cityOpen:false }),
+      citySearch: this.state.citySearch,
+      onCitySearch: (e)=>this.setState({citySearch:e.target.value}),
+      onUseLocation: ()=>this.setState({ usingLocation:true, city:'Position actuelle', cityOpen:false }),
+      locationLabel: this.state.usingLocation ? '📍 Position actuelle activée' : 'Me géolocaliser',
+      navExplorer: ()=>this.nav('Explorer.dc.html'),
+      navAgenda: ()=>this.nav('Agenda.dc.html'),
+      navGroupes: ()=>this.nav('uploads/buddy-design-kit/08-onglet-buddy.html'),
+      navMessages: ()=>this.nav('Messages-Liste.dc.html'),
+      navMoi: ()=>this.nav('uploads/buddy-design-kit/09-profil-visibilite.html'),
+      heroGo: ()=>this.nav('uploads/buddy-design-kit/03-fiche-event.html'),
+      heroQui: ()=>this.nav('uploads/buddy-design-kit/04-appel-ouvert.html'),
+    };
+  }
+}
+</script>
+</body>
+</html>

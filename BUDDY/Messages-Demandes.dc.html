@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #E8E4DF; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 24px 16px; }
+  .md-scroll::-webkit-scrollbar { display: none; }
+</style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#F7F4F0; border-radius:48px; overflow:hidden; position:relative; display:flex; flex-direction:column;">
+
+  <!-- Dark header -->
+  <div style="background:#1A1A2E; flex-shrink:0; padding-bottom:18px; border-radius:0 0 26px 26px;">
+    <div style="padding:14px 24px 0;"><span style="font-weight:600; font-size:15px; color:#fff;">20:14</span></div>
+    <div style="padding:14px 24px 0; display:flex; align-items:center; gap:12px;">
+      <div onClick="{{ onBack }}" style="width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:20px; color:#fff;">Demandes</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.6);">{{ totalCount }} en attente</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="md-scroll" style="flex:1; overflow-y:auto; padding:18px 24px 24px;">
+
+    <!-- Demandes d'amis -->
+    <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin-bottom:12px;">Demandes d'amis</div>
+    <sc-for list="{{ friendRequests }}" as="r" hint-placeholder-count="1">
+      <div style="background:#fff; border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div style="display:flex; gap:11px; margin-bottom:10px;">
+          <div style="width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#fff; flex-shrink:0; background:{{ r.color }};">{{ r.initial }}</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; color:#1A1A2E;">{{ r.name }} <span style="font-weight:500; color:#6B7280;">veut devenir ton Buddy</span></div>
+            <div style="font-size:11.5px; color:#6B7280; margin-top:2px;">{{ r.context }}</div>
+          </div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+          <sc-for list="{{ r.tags }}" as="t" hint-placeholder-count="2">
+            <span style="font-size:10.5px; font-weight:600; padding:4px 9px; border-radius:10px; background:{{ t.bg }}; color:{{ t.color }};">{{ t.label }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div onClick="{{ r.onDecline }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#F7F4F0; border:1.5px solid #E5E2DE; font-size:12.5px; font-weight:600; color:#6B7280; cursor:pointer;">Refuser</div>
+          <div onClick="{{ r.onAccept }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#FF5C57; font-size:12.5px; font-weight:700; color:#fff; font-family:'Poppins',sans-serif; cursor:pointer;">Accepter</div>
+        </div>
+      </div>
+    </sc-for>
+
+    <!-- Invitations groupe -->
+    <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin:20px 0 12px;">Invitations dans un groupe</div>
+    <sc-for list="{{ groupInvites }}" as="g" hint-placeholder-count="1">
+      <div style="background:#fff; border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;">
+          <div style="width:40px; height:40px; position:relative; flex-shrink:0;">
+            <sc-for list="{{ g.stackAvatars }}" as="a" hint-placeholder-count="3">
+              <div style="{{ a.style }}">{{ a.initial }}</div>
+            </sc-for>
+          </div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; color:#1A1A2E;">{{ g.inviter }} <span style="font-weight:500; color:#6B7280;">t'invite dans</span> {{ g.groupName }}</div>
+            <div style="font-size:11.5px; color:#6B7280; margin-top:2px;">{{ g.members }}</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div onClick="{{ g.onDecline }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#F7F4F0; border:1.5px solid #E5E2DE; font-size:12.5px; font-weight:600; color:#6B7280; cursor:pointer;">Refuser</div>
+          <div onClick="{{ g.onJoin }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#FF5C57; font-size:12.5px; font-weight:700; color:#fff; font-family:'Poppins',sans-serif; cursor:pointer;">Rejoindre</div>
+        </div>
+      </div>
+    </sc-for>
+
+    <!-- Nouvelles conversations -->
+    <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin:20px 0 12px;">Nouvelles conversations</div>
+    <sc-for list="{{ newConvos }}" as="n" hint-placeholder-count="1">
+      <div style="background:#fff; border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div style="display:flex; gap:11px; margin-bottom:8px;">
+          <div style="width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#fff; flex-shrink:0; background:{{ n.color }};">{{ n.initial }}</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; color:#1A1A2E;">{{ n.name }} <span style="font-weight:500; color:#6B7280;">veut démarrer une conversation</span></div>
+            <div style="font-size:11.5px; color:#6B7280; margin-top:2px;">{{ n.context }}</div>
+          </div>
+        </div>
+        <div style="background:#F7F4F0; border-radius:10px; padding:9px 11px; font-size:12px; color:#1A1A2E; margin-bottom:12px; font-style:italic;">« {{ n.message }} »</div>
+        <div style="display:flex; gap:8px;">
+          <div onClick="{{ n.onIgnore }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#F7F4F0; border:1.5px solid #E5E2DE; font-size:12.5px; font-weight:600; color:#6B7280; cursor:pointer;">Ignorer</div>
+          <div onClick="{{ n.onReply }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#FF5C57; font-size:12.5px; font-weight:700; color:#fff; font-family:'Poppins',sans-serif; cursor:pointer;">Répondre</div>
+        </div>
+      </div>
+    </sc-for>
+
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { removed: {} };
+  }
+
+  nav(file){ try { (window.parent||window).postMessage({type:'omnav', file:file}, '*'); } catch(e){} }
+
+  stackStyle(list){
+    return list.map((a,i)=>({ initial:a.i,
+      style:'position:absolute; width:26px; height:26px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; background:'+a.c+'; '
+        + (i===0?'top:0; left:0;': i===1?'top:0; right:0;': 'bottom:0; left:7px;') + ' z-index:'+(3-i)+';' }));
+  }
+
+  renderVals(){
+    const friendRequests = [
+      { initial:'S', color:'#EC4899', name:'Sarah', context:'Vous étiez tous les deux aux Impromptus du Jeudi',
+        tags:[{label:'🎭 Théâtre', bg:'#FFE8E7', color:'#FF5C57'},{label:'🎵 Concerts', bg:'#F1EBFE', color:'#8B5CF6'}],
+        onAccept:()=>this.nav('Messages-Conversation.dc.html'), onDecline:()=>{} },
+    ];
+    const groupInvites = [
+      { inviter:'Antoine', groupName:'Bande du Jeudi', members:'Marc, Léa, Tom +2', stackAvatars:this.stackStyle([{i:'M',c:'#FF5C57'},{i:'L',c:'#8B5CF6'},{i:'T',c:'#22C55E'}]),
+        onJoin:()=>this.nav('Messages-Conversation.dc.html'), onDecline:()=>{} },
+    ];
+    const newConvos = [
+      { initial:'N', color:'#0EA5E9', name:'Nina', context:'A répondu à ton appel ouvert sur Jazz Session', message:'Salut ! Je suis chaude pour y aller aussi 🎷',
+        onReply:()=>this.nav('Messages-Conversation.dc.html'), onIgnore:()=>{} },
+    ];
+    return {
+      onBack: ()=>this.nav('Messages-Liste.dc.html'),
+      totalCount: friendRequests.length + groupInvites.length + newConvos.length,
+      friendRequests, groupInvites, newConvos,
+    };
+  }
+}
+</script>
+</body>
+</html>
