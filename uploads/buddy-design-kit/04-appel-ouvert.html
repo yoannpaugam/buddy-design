@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Buddy — Appel ouvert</title>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --coral: #FF5C57;
+    --coral-light: #FFE8E7;
+    --coral-mid: #FFB3B1;
+    --night: #1A1A2E;
+    --warm-white: #F7F4F0;
+    --gray: #6B7280;
+    --gray-light: #E5E2DE;
+    --white: #FFFFFF;
+    --purple: #8B5CF6;
+    --purple-light: #EDE9FE;
+    --green: #22C55E;
+    --green-light: #DCFCE7;
+  }
+
+  body {
+    background: #E8E4DF;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    padding: 24px 16px;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  /* Label above each phone */
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .phone-label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #888;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .phone {
+    width: 360px;
+    height: 780px;
+    background: var(--warm-white);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.07);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status bar */
+  .status-bar {
+    padding: 14px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-weight: 600; font-size: 15px; }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+  .status-icons svg { width: 15px; height: 15px; }
+
+  /* ================================
+     ÉCRAN 1 — COMPOSER L'APPEL
+  ================================ */
+
+  .screen-1 .status-bar { background: var(--white); color: var(--night); }
+  .screen-1 .status-icons svg { fill: var(--night); }
+
+  .sheet-handle-wrap {
+    background: var(--white);
+    padding: 10px 0 0;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--gray-light);
+    border-radius: 2px;
+  }
+
+  .sheet-header {
+    background: var(--white);
+    padding: 16px 24px 20px;
+    flex-shrink: 0;
+  }
+  .sheet-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--night);
+    margin-bottom: 4px;
+  }
+  .sheet-subtitle {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  /* Event recap mini */
+  .event-recap {
+    margin: 0 24px 20px;
+    background: var(--warm-white);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--gray-light);
+  }
+  .event-recap-emoji {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .event-recap-info {}
+  .event-recap-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--night);
+    margin-bottom: 2px;
+  }
+  .event-recap-meta { font-size: 12px; color: var(--gray); }
+
+  /* Message composer */
+  .composer-wrap {
+    padding: 0 24px;
+    margin-bottom: 16px;
+  }
+  .composer-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .composer-box {
+    background: var(--white);
+    border: 2px solid var(--coral);
+    border-radius: 16px;
+    padding: 14px 16px;
+    position: relative;
+  }
+  .composer-text {
+    font-size: 15px;
+    color: var(--night);
+    line-height: 1.5;
+    min-height: 60px;
+  }
+  .composer-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 18px;
+    background: var(--coral);
+    border-radius: 1px;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 1px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .composer-counter {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-size: 11px;
+    color: var(--gray);
+  }
+
+  /* Quick phrases */
+  .quick-wrap {
+    padding: 0 24px;
+    margin-bottom: 20px;
+  }
+  .quick-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .quick-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .quick-pill {
+    padding: 7px 13px;
+    background: var(--warm-white);
+    border: 1.5px solid var(--gray-light);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--night);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* Audience toggle */
+  .audience-wrap {
+    padding: 0 24px;
+    margin-bottom: 20px;
+  }
+  .audience-toggle {
+    display: flex;
+    background: var(--white);
+    border-radius: 14px;
+    padding: 4px;
+    gap: 4px;
+    border: 1.5px solid var(--gray-light);
+  }
+  .audience-opt {
+    flex: 1;
+    padding: 9px 6px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray);
+  }
+  .audience-opt.active {
+    background: var(--night);
+    color: white;
+    font-weight: 600;
+  }
+  .audience-opt .opt-icon { font-size: 14px; display: block; margin-bottom: 2px; }
+
+  .publish-btn {
+    margin: 0 24px;
+    background: var(--coral);
+    border-radius: 16px;
+    padding: 15px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: white;
+    letter-spacing: -0.2px;
+  }
+
+  /* ================================
+     ÉCRAN 2 — RÉPONSE REÇUE
+  ================================ */
+
+  .screen-2 .status-bar { background: var(--warm-white); color: var(--night); }
+  .screen-2 .status-icons svg { fill: var(--night); }
+
+  .notif-header {
+    background: var(--warm-white);
+    padding: 14px 24px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--gray-light);
+    flex-shrink: 0;
+  }
+  .notif-back svg { width: 20px; height: 20px; color: var(--night); }
+  .notif-title-wrap {}
+  .notif-screen-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--night);
+  }
+  .notif-screen-sub { font-size: 12px; color: var(--gray); }
+
+  /* Push notif card */
+  .push-notif {
+    margin: 16px 20px;
+    background: var(--night);
+    border-radius: 20px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    box-shadow: 0 8px 24px rgba(26,26,46,0.25);
+    flex-shrink: 0;
+  }
+  .push-app-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--coral);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .push-content { flex: 1; min-width: 0; }
+  .push-app-name { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 3px; }
+  .push-text { font-size: 13px; color: white; line-height: 1.4; }
+  .push-text strong { font-weight: 600; }
+  .push-time { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+  /* Chat thread */
+  .chat-event-banner {
+    margin: 0 20px 12px;
+    background: var(--coral-light);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .chat-event-emoji { font-size: 20px; flex-shrink: 0; }
+  .chat-event-info {}
+  .chat-event-name { font-size: 12px; font-weight: 600; color: var(--night); }
+  .chat-event-meta { font-size: 11px; color: var(--gray); }
+
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scrollbar-width: none;
+  }
+  .chat-area::-webkit-scrollbar { display: none; }
+
+  .chat-date-sep {
+    text-align: center;
+    font-size: 11px;
+    color: var(--gray);
+    padding: 4px 0;
+  }
+
+  /* Call original */
+  .call-original {
+    background: var(--white);
+    border-radius: 14px 14px 14px 4px;
+    padding: 12px 14px;
+    max-width: 80%;
+    border: 1.5px solid var(--gray-light);
+    align-self: flex-start;
+  }
+  .call-original-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .msg-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .msg-name { font-size: 12px; font-weight: 600; color: var(--night); }
+  .msg-tag {
+    font-size: 10px;
+    background: var(--coral-light);
+    color: var(--coral);
+    border-radius: 10px;
+    padding: 2px 7px;
+    font-weight: 600;
+  }
+  .msg-text { font-size: 13px; color: var(--night); line-height: 1.5; }
+  .msg-time { font-size: 10px; color: var(--gray); margin-top: 4px; }
+
+  /* Incoming message */
+  .msg-in {
+    background: var(--white);
+    border-radius: 14px 14px 14px 4px;
+    padding: 12px 14px;
+    max-width: 80%;
+    border: 1.5px solid var(--gray-light);
+    align-self: flex-start;
+  }
+
+  /* Outgoing */
+  .msg-out {
+    background: var(--night);
+    border-radius: 14px 14px 4px 14px;
+    padding: 12px 14px;
+    max-width: 78%;
+    align-self: flex-end;
+  }
+  .msg-out .msg-text { color: white; }
+  .msg-out .msg-time { color: rgba(255,255,255,0.4); text-align: right; }
+
+  /* WhatsApp CTA */
+  .whatsapp-cta {
+    margin: 0 20px 8px;
+    background: var(--green-light);
+    border: 1.5px solid #86EFAC;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .wa-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+  .wa-text { flex: 1; }
+  .wa-title { font-size: 13px; font-weight: 600; color: var(--night); margin-bottom: 2px; }
+  .wa-sub { font-size: 11px; color: var(--gray); }
+  .wa-btn {
+    padding: 7px 12px;
+    background: var(--green);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Reply bar */
+  .reply-bar {
+    padding: 10px 16px 24px;
+    background: var(--white);
+    border-top: 1px solid var(--gray-light);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .reply-input {
+    flex: 1;
+    background: var(--warm-white);
+    border-radius: 22px;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--gray);
+    border: 1.5px solid var(--gray-light);
+  }
+  .reply-send {
+    width: 40px;
+    height: 40px;
+    background: var(--coral);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .reply-send svg { width: 18px; height: 18px; color: white; }
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN 1 : Composer l'appel -->
+<div class="phone-wrap">
+  <div class="phone-label">① Lancer un appel</div>
+  <div class="phone screen-1">
+
+    <div class="status-bar">
+      <span class="time">20:31</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+      </div>
+    </div>
+
+    <div class="sheet-handle-wrap">
+      <div class="sheet-handle"></div>
+    </div>
+
+    <div class="sheet-header">
+      <div class="sheet-title">👋 Qui vient avec moi ?</div>
+      <div class="sheet-subtitle">Lance un appel visible par les autres participants de cet event.</div>
+    </div>
+
+    <!-- Event recap -->
+    <div class="event-recap">
+      <div class="event-recap-emoji">🎭</div>
+      <div class="event-recap-info">
+        <div class="event-recap-name">Les Impromptus du Jeudi</div>
+        <div class="event-recap-meta">Jeu. 3 juillet · 20h30 · Le Ferrailleur</div>
+      </div>
+    </div>
+
+    <!-- Composer -->
+    <div class="composer-wrap">
+      <div class="composer-label">Ton message</div>
+      <div class="composer-box">
+        <div class="composer-text">Quelqu'un pour m'accompagner ce soir ? Je suis dispo dès 20h 🙋<div class="composer-cursor"></div></div>
+        <div class="composer-counter">62 / 140</div>
+      </div>
+    </div>
+
+    <!-- Quick phrases -->
+    <div class="quick-wrap">
+      <div class="quick-label">Suggestions rapides</div>
+      <div class="quick-pills">
+        <div class="quick-pill">Y'a quelqu'un ? 👀</div>
+        <div class="quick-pill">On fait le trajet ensemble ?</div>
+        <div class="quick-pill">Je cherche 1 personne</div>
+        <div class="quick-pill">Dispo en dernière minute</div>
+      </div>
+    </div>
+
+    <!-- Audience -->
+    <div class="audience-wrap">
+      <div class="composer-label" style="margin-bottom: 8px;">Visible par</div>
+      <div class="audience-toggle">
+        <div class="audience-opt active">
+          <span class="opt-icon">🌍</span>
+          Tous
+        </div>
+        <div class="audience-opt">
+          <span class="opt-icon">👥</span>
+          Mes Buddies
+        </div>
+        <div class="audience-opt">
+          <span class="opt-icon">🏙️</span>
+          Ma ville
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="publish-btn">Lancer l'appel →</div>
+
+  </div>
+</div>
+
+<!-- ÉCRAN 2 : Réponse reçue + chat -->
+<div class="phone-wrap">
+  <div class="phone-label">② Réponse & suite</div>
+  <div class="phone screen-2">
+
+    <div class="status-bar" style="background: var(--warm-white);">
+      <span class="time" style="color: var(--night);">20:47</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24" fill="#1A1A2E"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+        <svg viewBox="0 0 24 24" fill="#1A1A2E"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+      </div>
+    </div>
+
+    <!-- Push notif -->
+    <div class="push-notif">
+      <div class="push-app-icon" style="font-family:'Caprasimo',cursive; color:#FF5C57;">B</div>
+      <div class="push-content">
+        <div class="push-app-name">BUDDY · MAINTENANT</div>
+        <div class="push-text"><strong>Léa</strong> a répondu à ton appel sur Les Impromptus du Jeudi 🎭</div>
+        <div class="push-time">Il y a 2 minutes</div>
+      </div>
+    </div>
+
+    <!-- Chat header -->
+    <div class="notif-header">
+      <div class="notif-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </div>
+      <div class="notif-title-wrap">
+        <div class="notif-screen-title">Léa · 2 km de toi</div>
+        <div class="notif-screen-sub">À propos des Impromptus du Jeudi</div>
+      </div>
+    </div>
+
+    <!-- Event banner -->
+    <div class="chat-event-banner">
+      <div class="chat-event-emoji">🎭</div>
+      <div class="chat-event-info">
+        <div class="chat-event-name">Les Impromptus du Jeudi</div>
+        <div class="chat-event-meta">Jeu. 3 juillet · 20h30 · Le Ferrailleur</div>
+      </div>
+    </div>
+
+    <!-- Chat messages -->
+    <div class="chat-area">
+
+      <div class="chat-date-sep">Aujourd'hui · 20h31</div>
+
+      <!-- Original call -->
+      <div class="call-original">
+        <div class="call-original-header">
+          <div class="msg-avatar" style="background: var(--coral);">T</div>
+          <span class="msg-name">Toi</span>
+          <span class="msg-tag">Appel ouvert</span>
+        </div>
+        <div class="msg-text">Quelqu'un pour m'accompagner ce soir ? Je suis dispo dès 20h 🙋</div>
+        <div class="msg-time">20h31</div>
+      </div>
+
+      <!-- Response from Léa -->
+      <div class="msg-in">
+        <div class="call-original-header">
+          <div class="msg-avatar" style="background: var(--purple);">L</div>
+          <span class="msg-name">Léa</span>
+        </div>
+        <div class="msg-text">Coucou ! Moi je voulais y aller mais j'avais personne 😄 T'es dans quel coin ?</div>
+        <div class="msg-time">20h45</div>
+      </div>
+
+      <!-- My reply -->
+      <div class="msg-out">
+        <div class="msg-text">Je suis vers Bouffay, on peut se rejoindre au Ferrailleur directement ?</div>
+        <div class="msg-time">20h46 · Lu ✓✓</div>
+      </div>
+
+      <!-- Léa again -->
+      <div class="msg-in">
+        <div class="call-original-header">
+          <div class="msg-avatar" style="background: var(--purple);">L</div>
+          <span class="msg-name">Léa</span>
+        </div>
+        <div class="msg-text">Parfait ! À tout à l'heure alors 🎭✨</div>
+        <div class="msg-time">20h47</div>
+      </div>
+
+    </div>
+
+    <!-- WhatsApp bridge CTA -->
+    <div class="whatsapp-cta">
+      <div class="wa-icon">💬</div>
+      <div class="wa-text">
+        <div class="wa-title">Continuer sur WhatsApp ?</div>
+        <div class="wa-sub">Partage un lien pour rester en contact</div>
+      </div>
+      <div class="wa-btn">Partager</div>
+    </div>
+
+    <!-- Reply bar -->
+    <div class="reply-bar">
+      <div class="reply-input">Écrire un message…</div>
+      <div class="reply-send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+/* OM_ACT_WIRED */
+(function(){
+  function omnav(file){ try{ (window.parent||window).postMessage({type:'omnav',file:file},'*'); }catch(e){} }
+  var acts = [[".publish-btn","uploads/buddy-design-kit/05-flow-appel-complet.html"]];
+  acts.forEach(function(pair){
+    document.querySelectorAll(pair[0]).forEach(function(el){
+      el.style.cursor='pointer';
+      el.addEventListener('click', function(ev){ ev.stopPropagation(); omnav(pair[1]); });
+    });
+  });
+})();
+</script>
+<script>
+/* OM_WA_SHARE_WIRED */
+(function(){
+  var waBtn = document.querySelector('.wa-btn');
+  if (waBtn) {
+    waBtn.style.cursor = 'pointer';
+    waBtn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      var orig = waBtn.textContent;
+      waBtn.textContent = 'Copié ✓';
+      setTimeout(function(){ waBtn.textContent = orig; }, 1500);
+    });
+  }
+})();
+</script>
+</body>
+</html>

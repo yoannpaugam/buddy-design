@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #E8E4DF; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 24px 16px; }
+  .rb-scroll::-webkit-scrollbar { display: none; }
+</style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#F7F4F0; border-radius:48px; overflow:hidden; position:relative; display:flex; flex-direction:column;">
+
+  <div style="background:#1A1A2E; flex-shrink:0; padding-bottom:20px; border-radius:0 0 26px 26px;">
+    <div style="padding:14px 28px 0;">
+      <span style="font-weight:600; font-size:15px; color:#fff;">20:14</span>
+    </div>
+    <div style="padding:16px 24px 0; display:flex; align-items:center; gap:12px;">
+      <div onClick="{{ onBack }}" style="width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:19px; color:#fff;">Trouver un Buddy</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.55);">Rencontre des gens qui partagent tes goûts</div>
+      </div>
+    </div>
+
+    <div style="padding:16px 24px 0;">
+      <div style="background:rgba(255,255,255,0.1); border-radius:14px; padding:11px 16px; display:flex; align-items:center; gap:9px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span style="font-size:13px; color:rgba(255,255,255,0.6);">Rechercher par prénom…</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rb-scroll" style="flex:1; overflow-y:auto; padding:18px 24px 20px;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; color:#1A1A2E;">Suggérés pour toi</div>
+      <div onClick="{{ onOpenFilter }}" style="display:flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; color:#6B7280; cursor:pointer;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        Filtrer
+      </div>
+    </div>
+
+    <sc-for list="{{ suggested }}" as="p" hint-placeholder-count="3">
+      <div style="background:#fff; border-radius:18px; padding:14px; margin-bottom:12px; box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+        <div style="display:flex; gap:12px; margin-bottom:10px;">
+          <div style="width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:600; font-size:17px; color:#fff; flex-shrink:0; background:{{ p.avatarBg }};">{{ p.initial }}</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; color:#1A1A2E;">{{ p.name }}, {{ p.city }}</div>
+            <div style="font-size:11.5px; color:#6B7280; margin-top:2px;">{{ p.common }}</div>
+          </div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+          <sc-for list="{{ p.tags }}" as="t" hint-placeholder-count="3">
+            <span style="font-size:10.5px; font-weight:600; color:#8B5CF6; background:#F1EBFE; padding:3px 9px; border-radius:8px;">{{ t }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div onClick="{{ p.onIgnore }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#F7F4F0; border:1.5px solid #E5E2DE; font-size:12.5px; font-weight:600; color:#6B7280; cursor:pointer;">Ignorer</div>
+          <div onClick="{{ p.onAdd }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#FF5C57; font-family:'Poppins',sans-serif; font-weight:600; font-size:12.5px; color:#fff; cursor:pointer;">+ Ajouter</div>
+        </div>
+      </div>
+    </sc-for>
+
+    <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; color:#1A1A2E; margin:20px 0 14px;">Personnes croisées récemment</div>
+    <sc-for list="{{ crossed }}" as="p" hint-placeholder-count="2">
+      <div style="background:#fff; border-radius:18px; padding:14px; margin-bottom:12px; box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+        <div style="display:flex; gap:12px; margin-bottom:10px;">
+          <div style="width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:600; font-size:17px; color:#fff; flex-shrink:0; background:{{ p.avatarBg }};">{{ p.initial }}</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; color:#1A1A2E;">{{ p.name }}, {{ p.city }}</div>
+            <div style="font-size:11.5px; color:#6B7280; margin-top:2px;">{{ p.common }}</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div onClick="{{ p.onIgnore }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#F7F4F0; border:1.5px solid #E5E2DE; font-size:12.5px; font-weight:600; color:#6B7280; cursor:pointer;">Ignorer</div>
+          <div onClick="{{ p.onAdd }}" style="flex:1; text-align:center; padding:10px; border-radius:12px; background:#FF5C57; font-family:'Poppins',sans-serif; font-weight:600; font-size:12.5px; color:#fff; cursor:pointer;">+ Ajouter</div>
+        </div>
+      </div>
+    </sc-for>
+
+    <sc-if value="{{ hasInterest }}" hint-placeholder-val="{{ false }}">
+      <div style="display:inline-flex; align-items:center; gap:6px; background:#1A1A2E; color:#fff; font-size:12px; font-weight:600; padding:6px 12px; border-radius:16px; margin-bottom:8px;">{{ activeInterest }}
+        <span onClick="{{ onClearInterest }}" style="cursor:pointer;">✕</span>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <!-- ============ FILTER SHEET ============ -->
+  <sc-if value="{{ filtersOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseFilters }}" style="position:absolute; inset:0; z-index:50; background:rgba(26,26,46,0.5); backdrop-filter:blur(2px); display:flex; flex-direction:column; justify-content:flex-end;">
+      <div onClick="{{ stop }}" style="background:#F7F4F0; border-radius:26px 26px 0 0; max-height:82%; display:flex; flex-direction:column; box-shadow:0 -8px 40px rgba(0,0,0,0.25);">
+        <div style="flex-shrink:0; padding:8px 0 0;">
+          <div style="width:40px; height:5px; border-radius:3px; background:#D6D0C8; margin:8px auto 6px;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 24px 12px;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:19px; color:#1A1A2E;">Filtrer</div>
+            <div onClick="{{ onResetFilters }}" style="font-size:13px; font-weight:600; color:#FF5C57; cursor:pointer;">Réinitialiser</div>
+          </div>
+        </div>
+        <div class="rb-scroll" style="flex:1; overflow-y:auto; padding:4px 24px 8px;">
+          <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:14px; color:#1A1A2E; margin:10px 0 10px;">Centres d'intérêt</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px;">
+            <sc-for list="{{ interests }}" as="i" hint-placeholder-count="8">
+              <div onClick="{{ i.onClick }}" style="{{ i.style }}">{{ i.label }}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:14px; color:#1A1A2E;">Distance max</div>
+            <div style="font-size:13px; font-weight:600; color:#FF5C57;">{{ distLabel }}</div>
+          </div>
+          <input type="range" min="1" max="30" step="1" value="{{ distValue }}" onInput="{{ onDist }}" style="width:100%; accent-color:#FF5C57; margin-bottom:22px;" />
+          <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:14px; color:#1A1A2E; margin:0 0 10px;">Membre depuis</div>
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <sc-for list="{{ recency }}" as="r" hint-placeholder-count="2">
+              <div onClick="{{ r.onClick }}" style="{{ r.style }}">{{ r.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex-shrink:0; padding:14px 24px 28px; border-top:1px solid #E5E2DE; background:#F7F4F0;">
+          <div onClick="{{ onCloseFilters }}" style="width:100%; text-align:center; background:#FF5C57; color:#fff; font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; padding:15px; border-radius:16px; cursor:pointer;">Voir les résultats</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.SUGGESTED = [
+      { name:'Ines', initial:'I', avatarBg:'#8B5CF6', city:'Nantes', common:'Vous étiez tous les deux à Jazz Session — Duo Moreau', tags:['Concerts','Culture'] },
+      { name:'Yanis', initial:'Y', avatarBg:'#F59E0B', city:'Nantes', common:'2 events en commun', tags:['Impro','Stand-up'] },
+      { name:'Julie', initial:'J', avatarBg:'#EC4899', city:'Nantes', common:'3 events en commun', tags:['Théâtre','Jeux de société','Concerts'] },
+    ];
+    this.CROSSED = [
+      { name:'Paul', initial:'P', avatarBg:'#22C55E', city:'Nantes', common:'Vous étiez tous les deux à Vente de plantes — il y a 3 jours' },
+      { name:'Hugo', initial:'H', avatarBg:'#FF5C57', city:'Nantes', common:'Vous étiez tous les deux au Château des Ducs — il y a 6 jours' },
+    ];
+    this.INTERESTS = ['🎭 Théâtre','🎵 Concerts','🎲 Jeux','🌿 Sorties nature','⚽ Sport','🎨 Culture','🌙 Nocturnes','🎤 Stand-up'];
+    this.state = { interest:null, dist:10, recency:'récent', filtersOpen:false, ignored:[] };
+  }
+
+  nav(file){ try { (window.parent||window).postMessage({type:'omnav', file:file}, '*'); } catch(e){} }
+
+  renderVals(){
+    const S = this.state;
+    const mkCard = (p) => ({ ...p, onIgnore:()=>{ const ignored = this.state.ignored.slice(); ignored.push(p.name); this.setState({ignored}); }, onAdd:()=>this.nav('uploads/buddy-design-kit/08-onglet-buddy.html') });
+    const filtered = (list) => list.filter(p => !S.ignored.includes(p.name)).filter(p => !S.interest || (p.tags && p.tags.some(t=>t.includes(S.interest.replace(/^\S+ /,'')))));
+
+    const interests = this.INTERESTS.map(label=>({ label, onClick:()=>this.setState({interest: S.interest===label?null:label}),
+      style:'padding:9px 14px; border-radius:20px; font-size:12.5px; font-weight:600; cursor:pointer; '
+        + (S.interest===label ? 'background:#FF5C57; color:#fff;' : 'background:#fff; color:#1A1A2E; border:1.5px solid #E5E2DE;') }));
+
+    const recency = ['récent','ancien'].map(r=>({ label:r==='récent'?'Récent':'Ancien', onClick:()=>this.setState({recency:r}),
+      style:'padding:7px 14px; border-radius:18px; font-size:12.5px; font-weight:600; cursor:pointer; '
+        + (S.recency===r ? 'background:#1A1A2E; color:#fff;' : 'background:#fff; color:#6B7280; border:1.5px solid #E5E2DE;') }));
+
+    return {
+      onBack: ()=>this.nav('uploads/buddy-design-kit/08-onglet-buddy.html'),
+      onOpenFilter: ()=>this.setState({filtersOpen:true}),
+      suggested: filtered(this.SUGGESTED).map(mkCard),
+      crossed: filtered(this.CROSSED).map(mkCard),
+      interests,
+      distValue: S.dist, distLabel: S.dist+' km',
+      onDist: (e)=>this.setState({dist:parseInt(e.target.value,10)}),
+      recency,
+      filtersOpen: S.filtersOpen,
+      onCloseFilters: ()=>this.setState({filtersOpen:false}),
+      onResetFilters: ()=>this.setState({interest:null, dist:10, recency:'récent'}),
+      stop: (e)=>{ e.stopPropagation(); },
+      hasInterest: !!S.interest, activeInterest: S.interest, onClearInterest: ()=>this.setState({interest:null}),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #E8E4DF; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 24px 16px; }
+  .ml-scroll::-webkit-scrollbar { display: none; }
+</style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#F7F4F0; border-radius:48px; overflow:hidden; position:relative; display:flex; flex-direction:column;">
+
+  <div style="padding:14px 24px 0; flex-shrink:0;">
+    <span style="font-weight:600; font-size:15px; color:#1A1A2E;">20:14</span>
+  </div>
+
+  <!-- Header -->
+  <div style="padding:14px 24px 12px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between;">
+    <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:26px; color:#1A1A2E;">Messages</div>
+    <div style="display:flex; gap:8px;">
+      <div onClick="{{ onOpenBuddies }}" style="width:38px; height:38px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Requests banner -->
+  <sc-if value="{{ hasRequests }}" hint-placeholder-val="{{ true }}">
+    <div style="margin:0 24px 14px; flex-shrink:0;">
+      <div onClick="{{ onOpenRequests }}" style="background:#FEF3C7; border:1.5px solid #FCD34D; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px; cursor:pointer;">
+        <span style="font-size:17px;">⏳</span>
+        <div style="flex:1; font-size:12.5px; font-weight:600; color:#92400E;">{{ requestCount }} demande{{ requestPlural }} en attente</div>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- Conversation list -->
+  <div class="ml-scroll" style="flex:1; overflow-y:auto; padding:0 24px 16px;">
+    <sc-for list="{{ conversations }}" as="c" hint-placeholder-count="5">
+      <div onClick="{{ c.onOpen }}" style="display:flex; align-items:center; gap:12px; padding:10px 0; cursor:pointer;">
+        <div style="position:relative; flex-shrink:0;">
+          <sc-if value="{{ c.isSolo }}" hint-placeholder-val="{{ false }}">
+            <div style="width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color:#fff; background:{{ c.avatarColor }};">{{ c.avatarInitial }}</div>
+            <sc-if value="{{ c.online }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; bottom:1px; right:1px; width:12px; height:12px; background:#22C55E; border-radius:50%; border:2.5px solid #F7F4F0;"></div>
+            </sc-if>
+          </sc-if>
+          <sc-if value="{{ c.isGroup }}" hint-placeholder-val="{{ false }}">
+            <div style="width:52px; height:52px; position:relative;">
+              <sc-for list="{{ c.stackAvatars }}" as="a" hint-placeholder-count="3">
+                <div style="{{ a.style }}">{{ a.initial }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ c.isEvent }}" hint-placeholder-val="{{ false }}">
+            <div style="width:52px; height:52px; border-radius:16px; overflow:hidden; background:{{ c.avatarColor }};"><img src="{{ c.eventImg }}" alt="{{ c.title }}" style="width:100%; height:100%; object-fit:cover; display:block;" /></div>
+          </sc-if>
+          <div style="position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); font-size:9px; font-weight:700; color:{{ c.typeColor }}; background:{{ c.typeBg }}; padding:1px 6px; border-radius:6px; white-space:nowrap;">{{ c.typeLabel }}</div>
+        </div>
+        <div style="flex:1; min-width:0; padding-top:2px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:14px; color:#1A1A2E; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ c.title }}</div>
+            <span style="font-size:11px; color:#9A948C; flex-shrink:0; margin-left:8px;">{{ c.time }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="{{ c.previewStyle }}">{{ c.preview }}</div>
+            <sc-if value="{{ c.hasBadge }}" hint-placeholder-val="{{ false }}">
+              <div style="flex-shrink:0; margin-left:8px; min-width:19px; height:19px; padding:0 5px; background:#FF5C57; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; color:#fff;">{{ c.badge }}</div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+
+    <div style="text-align:center; padding:16px 0 12px; font-size:11px; color:#9A948C;">Plus anciennes</div>
+
+    <sc-for list="{{ archived }}" as="c" hint-placeholder-count="1">
+      <div onClick="{{ c.onOpen }}" style="display:flex; align-items:center; gap:12px; padding:10px 0; cursor:pointer; opacity:0.6;">
+        <div style="width:52px; height:52px; border-radius:16px; overflow:hidden; background:{{ c.avatarColor }}; flex-shrink:0;"><img src="{{ c.eventImg }}" alt="{{ c.title }}" style="width:100%; height:100%; object-fit:cover; display:block;" /></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:14px; color:#1A1A2E; margin-bottom:2px;">{{ c.title }}</div>
+          <div style="font-size:12px; color:#6B7280; font-style:italic;">{{ c.preview }}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- Bottom nav -->
+  <div style="background:#fff; border-top:1px solid #E5E2DE; padding:10px 0 24px; display:flex; justify-content:space-around; flex-shrink:0;">
+    <div onClick="{{ navAccueil }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 12px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Accueil</span>
+    </div>
+    <div onClick="{{ navExplorer }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 12px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Explorer</span>
+    </div>
+    <div onClick="{{ navAgenda }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 12px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Agenda</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 12px; position:relative;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF5C57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span style="font-size:10px; font-weight:600; color:#FF5C57;">Messages</span>
+      <div style="width:4px; height:4px; background:#FF5C57; border-radius:50%; position:absolute; bottom:-2px;"></div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.EVENT_IMG = {
+      thea: 'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=200&q=70',
+      plant: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=200&q=70',
+    };
+    this.CONVOS = [
+      { kind:'group', title:'Bande du Jeudi', sub:'5 membres', preview:'Léa : On se retrouve directement là-bas ? 🎭', time:'21h04', badge:3,
+        stack:[{i:'M',c:'#FF5C57'},{i:'L',c:'#8B5CF6'},{i:'T',c:'#22C55E'},{i:'A',c:'#F59E0B'}] },
+      { kind:'solo', title:'Léa', color:'#8B5CF6', initial:'L', online:true, preview:'Toi : J\u2019habite à 5 min d\u2019Erdre 🙌', time:'21h07', badge:0 },
+      { kind:'event', title:'Impromptus du Jeudi 🎭', sub:'4 participants', preview:'Romain a partagé son itinéraire', time:'Hier', badge:1, img:this.EVENT_IMG.thea, color:'#FFE8E7', system:true },
+      { kind:'group', title:'Jeux & Café', sub:'3 membres', preview:'Antoine : Soirée Terraforming Mars ?', time:'Lun.', badge:0,
+        stack:[{i:'A',c:'#F59E0B'},{i:'N',c:'#EC4899'},{i:'S',c:'#0EA5E9'}] },
+      { kind:'solo', title:'Marc', color:'#FF5C57', initial:'M', online:false, preview:'Toi : À samedi alors !', time:'Dim.', badge:0 },
+    ];
+    this.ARCHIVED = [
+      { title:'Vente de plantes — Racines 🌿', preview:'Archivée · 15 juin', img:this.EVENT_IMG.plant, color:'#DCFCE7' },
+    ];
+  }
+
+  nav(file){ try { (window.parent||window).postMessage({type:'omnav', file:file}, '*'); } catch(e){} }
+
+  renderVals(){
+    const typeStyle = (kind) => {
+      if (kind==='solo') return { typeLabel:'Solo', typeColor:'#8B5CF6', typeBg:'#F1EBFE' };
+      if (kind==='group') return { typeLabel:'Groupe', typeColor:'#16A34A', typeBg:'#DCFCE7' };
+      return { typeLabel:'Event', typeColor:'#FF5C57', typeBg:'#FFE8E7' };
+    };
+
+    const conversations = this.CONVOS.map(c => {
+      const ts = typeStyle(c.kind);
+      const stackAvatars = (c.stack||[]).map((a,i)=>({ initial:a.i,
+        style:'position:absolute; width:32px; height:32px; border-radius:50%; border:2px solid #F7F4F0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; background:'+a.c+'; '
+          + (i===0?'top:0; left:0;': i===1?'top:0; right:0;': 'bottom:0; left:14px;') + ' z-index:'+(3-i)+';' }));
+      return {
+        isSolo: c.kind==='solo', isGroup: c.kind==='group', isEvent: c.kind==='event',
+        title: c.title, time: c.time,
+        avatarColor: c.color, avatarInitial: c.initial, online: !!c.online,
+        eventImg: c.img, stackAvatars,
+        preview: c.system ? c.preview : c.preview,
+        previewStyle: 'font-size:12.5px; color:#6B7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; '
+          + (c.system ? 'font-style:italic; color:#9A948C;' : ''),
+        hasBadge: c.badge>0, badge: c.badge,
+        typeLabel: ts.typeLabel, typeColor: ts.typeColor, typeBg: ts.typeBg,
+        onOpen: ()=>this.nav(c.kind==='group' ? 'Groupe-Detail.dc.html#chat' : 'Messages-Conversation.dc.html'),
+      };
+    });
+
+    const archived = this.ARCHIVED.map(c=>({
+      title:c.title, preview:c.preview, avatarColor:c.color, eventImg:c.img,
+      onOpen: ()=>this.nav('Messages-Conversation.dc.html'),
+    }));
+
+    return {
+      hasRequests: true, requestCount: 3, requestPlural: 's',
+      onOpenRequests: ()=>this.nav('Messages-Demandes.dc.html'),
+      onOpenBuddies: ()=>this.nav('Messages-Buddies-Groupes.dc.html'),
+      conversations, archived,
+      navAccueil:()=>this.nav('Accueil.dc.html'),
+      navExplorer:()=>this.nav('Explorer.dc.html'),
+      navAgenda:()=>this.nav('Agenda.dc.html'),
+    };
+  }
+}
+</script>
+</body>
+</html>

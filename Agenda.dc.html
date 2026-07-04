@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #E8E4DF; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 24px 16px; }
+  .ag-scroll::-webkit-scrollbar { display: none; }
+</style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#F7F4F0; border-radius:48px; overflow:hidden; position:relative; box-shadow:0 32px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08); display:flex; flex-direction:column;">
+
+  <!-- Status bar -->
+  <div style="background:#F7F4F0; padding:14px 28px 0; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+    <span style="font-weight:600; font-size:15px; color:#1A1A2E;">20:14</span>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#1A1A2E"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#1A1A2E"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div style="padding:14px 24px 0; flex-shrink:0;">
+    <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:26px; color:#1A1A2E; margin-bottom:14px;">Agenda</div>
+
+    <!-- Subtabs -->
+    <div style="display:flex; gap:6px; background:#E5E2DE; border-radius:14px; padding:4px; margin-bottom:14px;">
+      <sc-for list="{{ subTabs }}" as="t" hint-placeholder-count="3">
+        <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= CONTENT ================= -->
+  <div class="ag-scroll" style="flex:1; overflow-y:auto; padding:2px 24px 16px;">
+
+    <!-- ============ CALENDRIER ============ -->
+    <sc-if value="{{ isCal }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff; border-radius:20px; border:1px solid #E5E2DE; padding:16px 16px 18px; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:16px; color:#1A1A2E;">{{ monthLabel }}</div>
+          <div style="display:flex; gap:6px;">
+            <div style="width:30px; height:30px; border-radius:9px; background:#F7F4F0; display:flex; align-items:center; justify-content:center; color:#6B7280;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </div>
+            <div style="width:30px; height:30px; border-radius:9px; background:#F7F4F0; display:flex; align-items:center; justify-content:center; color:#6B7280;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; margin-bottom:6px;">
+          <sc-for list="{{ dayNames }}" as="dn" hint-placeholder-count="7">
+            <div style="flex:1; text-align:center; font-size:10.5px; font-weight:600; color:#9A948C; letter-spacing:0.3px;">{{ dn }}</div>
+          </sc-for>
+        </div>
+        <sc-for list="{{ calWeeks }}" as="week" hint-placeholder-count="5">
+          <div style="display:flex; gap:2px; margin-bottom:2px;">
+            <sc-for list="{{ week }}" as="cell" hint-placeholder-count="7">
+              <div onClick="{{ cell.onClick }}" style="{{ cell.style }}">
+                <span>{{ cell.label }}</span>
+                <div style="{{ cell.dotStyle }}"></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin-bottom:12px;">{{ selDayLabel }}</div>
+
+      <sc-if value="{{ selDayEmpty }}" hint-placeholder-val="{{ true }}">
+        <div style="text-align:center; padding:26px 10px; color:#6B7280; font-size:12.5px; line-height:1.5;">Rien de prévu ce jour-là.<br>Explore les events à proximité ?</div>
+      </sc-if>
+
+      <sc-for list="{{ selDayEvents }}" as="e" hint-placeholder-count="1">
+        <div style="background:#fff; border-radius:16px; padding:12px; margin-bottom:10px; border:1px solid #E5E2DE;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:50px; flex-shrink:0; text-align:center;">
+              <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#1A1A2E;">{{ e.time }}</div>
+            </div>
+            <div style="width:1px; align-self:stretch; background:#E5E2DE;"></div>
+            <div style="width:44px; height:44px; border-radius:12px; overflow:hidden; flex-shrink:0; background:{{ e.bg }};"><img src="{{ e.img }}" alt="{{ e.title }}" style="width:100%; height:100%; object-fit:cover; display:block;" /></div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; color:#1A1A2E; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ e.title }}</div>
+              <div style="font-size:11px; color:#6B7280;">📍 {{ e.place }} · {{ e.dist }}</div>
+            </div>
+            <span style="{{ e.badgeStyle }}">{{ e.badgeLabel }}</span>
+          </div>
+          <div style="{{ e.companionStyle }}">{{ e.companionLabel }}</div>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <!-- ============ LISTE — À VENIR ============ -->
+    <sc-if value="{{ showAvenir }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:11px; font-weight:700; color:#FF5C57; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">⏰ Le plus proche</div>
+      <div style="background:#1A1A2E; border-radius:20px; margin-bottom:24px; position:relative; overflow:hidden;">
+        <img src="{{ nextUp.img }}" alt="{{ nextUp.title }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 100%);"></div>
+        <div style="position:relative; padding:18px;">
+        <div style="display:flex; gap:6px; margin-bottom:10px;">
+          <div style="display:inline-block; background:#FF5C57; color:#fff; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px;">{{ nextUp.countdown }}</div>
+          <div style="display:inline-block; background:rgba(255,255,255,0.15); color:#fff; font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px;">{{ nextUp.companionLabel }}</div>
+        </div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; color:#fff; margin-bottom:6px; position:relative;">{{ nextUp.title }}</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.65); margin-bottom:14px; position:relative;">{{ nextUp.meta }}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; position:relative;">
+          <div style="display:flex;">
+            <sc-for list="{{ nextUp.avatars }}" as="a" hint-placeholder-count="3">
+              <div style="{{ a.style }}">{{ a.initial }}</div>
+            </sc-for>
+          </div>
+          <div onClick="{{ openEvent }}" style="font-size:12px; font-weight:600; color:#fff; cursor:pointer;">Voir l'event →</div>
+        </div>
+        </div>
+      </div>
+
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin-bottom:10px;">Cette semaine <span style="font-size:11px; font-weight:500; color:#6B7280; font-family:'Inter',sans-serif;">· {{ avenirCount }}</span></div>
+      <sc-for list="{{ avenirEvents }}" as="e" hint-placeholder-count="3">
+        <div onClick="{{ e.onOpen }}" style="background:#fff; border-radius:16px; padding:12px; margin-bottom:10px; border:1px solid #E5E2DE; cursor:pointer;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:50px; flex-shrink:0; text-align:center;">
+              <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:#1A1A2E;">{{ e.time }}</div>
+              <div style="font-size:10px; color:#6B7280;">{{ e.dayShort }}</div>
+            </div>
+            <div style="width:1px; align-self:stretch; background:#E5E2DE;"></div>
+            <div style="width:44px; height:44px; border-radius:12px; overflow:hidden; flex-shrink:0; background:{{ e.bg }};"><img src="{{ e.img }}" alt="{{ e.title }}" style="width:100%; height:100%; object-fit:cover; display:block;" /></div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; color:#1A1A2E; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ e.title }}</div>
+              <div style="font-size:11px; color:#6B7280;">📍 {{ e.listMeta }}</div>
+            </div>
+            <span style="{{ e.badgeStyle }}">{{ e.badgeLabel }}</span>
+          </div>
+          <div style="{{ e.companionStyle }}">{{ e.companionLabel }}</div>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <!-- ============ LISTE — ENVIES ============ -->
+    <sc-if value="{{ showEnvies }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13px; color:#6B7280; margin:2px 0 14px; display:flex; align-items:center; gap:8px;">💭 Events marqués "envie"</div>
+      <sc-for list="{{ envieEvents }}" as="e" hint-placeholder-count="3">
+        <div style="background:#fff; border-radius:18px; overflow:hidden; margin-bottom:12px; border:1px solid #E5E2DE; position:relative;">
+          <div style="height:90px; overflow:hidden; background:{{ e.heroBg }};"><img src="{{ e.img }}" alt="{{ e.title }}" style="width:100%; height:100%; object-fit:cover; display:block;" /></div>
+          <div style="position:absolute; top:10px; right:10px; width:30px; height:30px; background:rgba(255,255,255,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5C57"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <div style="padding:12px 14px 14px;">
+            <span style="font-size:10px; font-weight:700; color:#FF5C57; background:#FFE8E7; padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.4px;">{{ e.tag }}</span>
+            <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin-bottom:6px;">{{ e.title }}</div>
+            <div style="font-size:11.5px; color:#6B7280; margin-bottom:12px; display:flex; gap:10px;"><span>📅 {{ e.dateLabel }}</span><span>📍 {{ e.dist }}</span></div>
+            <div style="display:flex; gap:8px;">
+              <div style="flex:1; text-align:center; padding:9px; border-radius:12px; background:#F7F4F0; border:1.5px solid #E5E2DE; font-size:12px; font-weight:600; color:#6B7280;">Retirer</div>
+              <div style="flex:1; text-align:center; padding:9px; border-radius:12px; background:#FF5C57; font-size:12px; font-weight:700; color:#fff; font-family:'Poppins',sans-serif;">J'y vais ✓</div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <!-- ============ LISTE — HISTORIQUE ============ -->
+    <sc-if value="{{ showHisto }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; gap:8px; margin-bottom:22px;">
+        <div style="flex:1; background:#fff; border-radius:16px; padding:14px 10px; text-align:center; border:1px solid #E5E2DE;">
+          <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#FF5C57; line-height:1; margin-bottom:4px;">23</div>
+          <div style="font-size:10px; color:#6B7280; font-weight:500;">Sorties</div>
+        </div>
+        <div style="flex:1; background:#fff; border-radius:16px; padding:14px 10px; text-align:center; border:1px solid #E5E2DE;">
+          <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#FF5C57; line-height:1; margin-bottom:4px;">12</div>
+          <div style="font-size:10px; color:#6B7280; font-weight:500;">Buddies rencontrés</div>
+        </div>
+        <div style="flex:1; background:#fff; border-radius:16px; padding:14px 10px; text-align:center; border:1px solid #E5E2DE;">
+          <div style="font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; color:#FF5C57; line-height:1; margin-bottom:4px;">6</div>
+          <div style="font-size:10px; color:#6B7280; font-weight:500;">Catégories testées</div>
+        </div>
+      </div>
+      <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:#1A1A2E; margin-bottom:10px;">Juin 2026</div>
+      <sc-for list="{{ histoEvents }}" as="e" hint-placeholder-count="3">
+        <div style="background:#fff; border-radius:16px; padding:12px; display:flex; gap:12px; margin-bottom:10px; border:1px solid #E5E2DE; align-items:center;">
+          <div style="width:42px; height:42px; border-radius:12px; overflow:hidden; flex-shrink:0; background:{{ e.bg }};"><img src="{{ e.img }}" alt="{{ e.title }}" style="width:100%; height:100%; object-fit:cover; display:block;" /></div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:13px; color:#1A1A2E; margin-bottom:3px;">{{ e.title }}</div>
+            <div style="font-size:11px; color:#6B7280;">{{ e.meta }}</div>
+            <div style="font-size:10px; color:#6B7280; margin-top:4px;">{{ e.companions }}</div>
+          </div>
+          <div style="flex-shrink:0; text-align:center;">
+            <div style="font-size:11px; color:#F59E0B; letter-spacing:1px;">{{ e.stars }}</div>
+            <div style="font-size:9px; color:#6B7280;">Noté</div>
+          </div>
+        </div>
+      </sc-for>
+    </sc-if>
+
+  </div>
+
+  <!-- Calendrier/Liste toggle pill (same style as Explorer) -->
+  <sc-if value="{{ showViewToggle }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ onToggleView }}" style="position:absolute; right:20px; bottom:100px; z-index:26; display:flex; align-items:center; gap:7px; background:#1A1A2E; color:#fff; padding:11px 16px; border-radius:24px; font-size:13px; font-weight:600; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.25); white-space:nowrap;">
+      <sc-if value="{{ isCal }}" hint-placeholder-val="{{ false }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </sc-if>
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </sc-if>
+      {{ viewToggleLabel }}
+    </div>
+  </sc-if>
+
+  <!-- Bottom nav -->
+  <div style="background:#fff; border-top:1px solid #E5E2DE; padding:10px 0 24px; display:flex; justify-content:space-around; flex-shrink:0;">
+    <div onClick="{{ navAccueil }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 12px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Accueil</span>
+    </div>
+    <div onClick="{{ navExplorer }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 12px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Explorer</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 12px; position:relative;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF5C57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span style="font-size:10px; font-weight:600; color:#FF5C57;">Agenda</span>
+      <div style="width:4px; height:4px; background:#FF5C57; border-radius:50%; position:absolute; bottom:-2px;"></div>
+    </div>
+    <div onClick="{{ navMessages }}" style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 12px; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span style="font-size:10px; font-weight:500; color:#6B7280;">Messages</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.TODAY = '2026-07-01';
+    this.DAYS_SHORT = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+    this.DAYS_FULL = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+
+    const P = {
+      thea:'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=400&q=70',
+      jazz:'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?auto=format&fit=crop&w=400&q=70',
+      plant:'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=400&q=70',
+      games:'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=400&q=70',
+      histo:'https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?auto=format&fit=crop&w=400&q=70',
+      dance:'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=400&q=70',
+      standup:'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=400&q=70' };
+    this.P = P;
+
+    // events, each with companions: null = solo, or array of {initial,color,name}
+    this.PERSO = [
+      { iso:'2026-07-03', time:'20:30', title:'Les Impromptus du Jeudi', img:P.thea, bg:'#FFE8E7', place:'Le Ferrailleur', dist:'1,2 km', status:'go',
+        companions:[{initial:'M',color:'#FF5C57',name:'Marc'},{initial:'L',color:'#8B5CF6',name:'Léa'},{initial:'T',color:'#22C55E',name:'Tom'}] },
+      { iso:'2026-07-04', time:'21:00', title:'Jazz Session — Duo Moreau', img:P.jazz, bg:'#EDE9FE', place:"L'Univers", dist:'3,4 km', status:'envie', tag:'Concert', heroBg:'linear-gradient(135deg,#1D4ED8 0%,#7C3AED 100%)', companions:null },
+      { iso:'2026-07-05', time:'17:00', title:'Vente de plantes — Racines', img:P.plant, bg:'#DCFCE7', place:'Bouffay', dist:'0,8 km', status:'go',
+        companions:[{initial:'M',color:'#FF5C57',name:'Marc'},{initial:'S',color:'#EC4899',name:'Sarah'}] },
+      { iso:'2026-07-09', time:'19:30', title:'Soirée jeux coopératifs', img:P.games, bg:'#DCFCE7', place:'Le Repaire', dist:'0,9 km', status:'envie', tag:'Jeux de société', heroBg:'linear-gradient(135deg,#166534 0%,#22C55E 100%)', companions:null },
+      { iso:'2026-07-12', time:'14:00', title:'Campement médiéval — Château', img:P.histo, bg:'#FEF3C7', place:'Château des Ducs', dist:'2,1 km', status:'envie', tag:'Reconstitution', heroBg:'linear-gradient(135deg,#92400E 0%,#D97706 100%)', companions:null },
+      { iso:'2026-07-11', time:'20:00', title:'Bal folk en plein air', img:P.dance, bg:'#FCE7F3', place:'Île de Nantes', dist:'2,8 km', status:'go',
+        companions:[{initial:'N',color:'#EC4899',name:'Nadia'},{initial:'J',color:'#0EA5E9',name:'Julien'}] },
+      { iso:'2026-07-17', time:'20h30', title:'Nuit du Stand-up', img:P.standup, bg:'#F1EBFE', place:'Le Chat Noir', dist:'1,6 km', status:'go',
+        companions:[{initial:'I',color:'#F59E0B',name:'Inès'},{initial:'K',color:'#10B981',name:'Karim'},{initial:'P',color:'#8B5CF6',name:'Paul'}] },
+    ];
+
+    this.HISTO = [
+      { img:P.games, bg:'#DCFCE7', title:'Soirée jeux — Le Repaire', meta:'22 juin · 19h30', companions:'avec Marc, Léa +2', stars:'★★★★★' },
+      { img:P.histo, bg:'#FFE8E7', title:'Reconstitution médiévale', meta:'15 juin · 14h00', companions:'Tu y étais seul', stars:'★★★★☆' },
+      { img:P.jazz, bg:'#EDE9FE', title:'Concert acoustique — La Cale', meta:'8 juin · 20h30', companions:'avec Antoine', stars:'★★★★★' },
+    ];
+
+    this.state = { view:'list', tab:'avenir', selDay:'2026-07-03' };
+  }
+
+  set(patch) { this.setState(patch); }
+  nav(file){ try { (window.parent||window).postMessage({type:'omnav', file:file}, '*'); } catch(e){} }
+
+  // Anchor to the mockups' calendar: 1 July 2026 treated as Tuesday, so 3=Thu, 4=Fri, 5=Sat.
+  dayNum(iso){ return +iso.split('-')[2]; }
+  dow(iso){ return (2 + (this.dayNum(iso) - 1)) % 7; }
+  dayShort(iso){ return this.DAYS_SHORT[this.dow(iso)]+' '+this.dayNum(iso); }
+  dateLabelFull(iso){ return this.DAYS_FULL[this.dow(iso)]+' '+this.dayNum(iso)+' juillet'; }
+  dateShortLabel(iso){ return this.DAYS_SHORT[this.dow(iso)]+' '+this.dayNum(iso)+' juillet'; }
+
+  badge(status){
+    if (status === 'go') return { badgeLabel:'✓ J\'y vais', badgeStyle:'font-size:10px; font-weight:600; padding:4px 9px; border-radius:12px; white-space:nowrap; background:#DCFCE7; color:#16A34A;' };
+    return { badgeLabel:'♡ Envie', badgeStyle:'font-size:10px; font-weight:600; padding:4px 9px; border-radius:12px; white-space:nowrap; background:#FFE8E7; color:#FF5C57;' };
+  }
+
+  companionInfo(companions){
+    if (!companions || !companions.length) {
+      return {
+        companionLabel: '🧍 Seul(e) pour l\u2019instant',
+        companionStyle: 'margin-top:9px; padding-top:9px; border-top:1px solid #F2EFEA; font-size:11px; color:#9A948C; font-weight:500;',
+      };
+    }
+    const names = companions.map(c=>c.name).join(', ');
+    return {
+      companionLabel: '👥 Avec ' + names,
+      companionStyle: 'margin-top:9px; padding-top:9px; border-top:1px solid #F2EFEA; font-size:11px; color:#7C3AED; font-weight:600;',
+    };
+  }
+
+  avatarStack(companions){
+    return (companions||[]).map((c,i)=>({ initial:c.initial,
+      style:'width:26px; height:26px; border-radius:50%; border:2px solid #1A1A2E; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; background:'+c.color+'; '+(i>0?'margin-left:-8px;':'') }));
+  }
+
+  renderVals(){
+    const S = this.state;
+    const forceListTab = S.tab !== 'avenir';
+    const isCal = S.view === 'cal' && !forceListTab;
+    const isList = S.view === 'list' || forceListTab;
+
+    const mkTab = (id,label) => ({ label, onClick:()=>this.set({tab:id}),
+      style: 'flex:1; text-align:center; padding:8px 4px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; '
+        + (S.tab===id ? 'background:#fff; color:#1A1A2E; box-shadow:0 2px 6px rgba(0,0,0,0.08);' : 'background:transparent; color:#6B7280;') });
+    const subTabs = [ mkTab('avenir','À venir'), mkTab('envies','Envies'), mkTab('historique','Historique') ];
+
+    // ---- calendar ----
+    const Y=2026, dim=31;
+    const lead=1; // 1 July 2026 → Tuesday (Monday-first grid), matches mockup weekdays
+    const evMap={};
+    this.PERSO.forEach(e=>{ (evMap[e.iso]=evMap[e.iso]||[]).push(e); });
+    const cells=[];
+    for(let i=0;i<lead;i++) cells.push({ label:'', dotStyle:'display:none;', style:'flex:1; aspect-ratio:1; ', onClick:()=>{} });
+    for(let d=1; d<=dim; d++){
+      const iso = Y+'-07-'+String(d).padStart(2,'0');
+      const has = !!evMap[iso];
+      const sel = iso===S.selDay;
+      const isToday = iso===this.TODAY;
+      let dotColor='#FF5C57';
+      if(has) dotColor = evMap[iso][0].status==='go' ? '#FF5C57' : '#F59E0B';
+      let st='flex:1; aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:12px; font-family:\'Poppins\',sans-serif; font-weight:600; font-size:13px; cursor:pointer; ';
+      if(sel) st+='background:#FF5C57; color:#fff;';
+      else if(isToday) st+='color:#FF5C57; border:1.5px solid #FFB3B1;';
+      else st+='color:#1A1A2E;';
+      const dot = has ? ('width:6px; height:6px; border-radius:50%; background:'+(sel?'#fff':dotColor)+';') : 'width:6px; height:6px; border-radius:50%; background:transparent;';
+      cells.push({ label:String(d), dotStyle:dot, style:st, onClick:()=>this.set({selDay:iso}) });
+    }
+    while(cells.length%7!==0) cells.push({ label:'', dotStyle:'display:none;', style:'flex:1; aspect-ratio:1;', onClick:()=>{} });
+    const calWeeks=[]; for(let i=0;i<cells.length;i+=7) calWeeks.push(cells.slice(i,i+7));
+
+    const selList = evMap[S.selDay] || [];
+    const selDayEvents = selList.map(e=>({ time:e.time, title:e.title, img:e.img, bg:e.bg, place:e.place, dist:e.dist, ...this.badge(e.status), ...this.companionInfo(e.companions) }));
+
+    // ---- à venir ----
+    const nextUpSrc = this.PERSO[0];
+    const nextUp = { img:nextUpSrc.img, countdown:'Dans 2 jours', title:nextUpSrc.title, meta:'Jeu. 3 juillet · 20h30 · Le Ferrailleur',
+      companionLabel: nextUpSrc.companions && nextUpSrc.companions.length ? nextUpSrc.companions.length+' Buddies avec toi' : 'Seul(e) pour l\u2019instant',
+      avatars: this.avatarStack(nextUpSrc.companions) };
+    const avenirEvents = this.PERSO.map(e=>({
+      time:e.time, dayShort:this.dayShort(e.iso), title:e.title, img:e.img, bg:e.bg,
+      listMeta: e.place+' · '+e.dist, ...this.badge(e.status), ...this.companionInfo(e.companions),
+      onOpen:()=>this.nav('uploads/buddy-design-kit/03-fiche-event.html'),
+    }));
+
+    // ---- envies ----
+    const envieEvents = this.PERSO.filter(e=>e.status==='envie').map(e=>({
+      img:e.img, heroBg:e.heroBg, tag:e.tag, title:e.title, dateLabel:this.dateShortLabel(e.iso)+' · '+e.time.replace(':','h'), dist:e.dist,
+    }));
+
+    return {
+      isCal, isList,
+      showAvenir: isList && S.tab==='avenir',
+      showEnvies: S.tab==='envies',
+      showHisto: S.tab==='historique',
+      selDayEmpty: isCal && selList.length===0,
+      subTabs,
+      showViewToggle: S.tab==='avenir',
+      onToggleView:()=>this.set({view: isCal ? 'list' : 'cal'}),
+      viewToggleLabel: isCal ? 'Liste' : 'Calendrier',
+      monthLabel:'Juillet 2026', dayNames:['L','M','M','J','V','S','D'], calWeeks,
+      selDayLabel:this.dateLabelFull(S.selDay), selDayEvents,
+      nextUp, avenirEvents, avenirCount:this.PERSO.length+' events', envieEvents, histoEvents:this.HISTO,
+      navAccueil:()=>this.nav('Accueil.dc.html'),
+      navExplorer:()=>this.nav('Explorer.dc.html'),
+      navGroupes:()=>this.nav('uploads/buddy-design-kit/08-onglet-buddy.html'),
+      navMessages:()=>this.nav('Messages-Liste.dc.html'),
+      navMoi:()=>this.nav('uploads/buddy-design-kit/09-profil-visibilite.html'),
+      openEvent:()=>this.nav('uploads/buddy-design-kit/03-fiche-event.html'),
+    };
+  }
+}
+</script>
+</body>
+</html>

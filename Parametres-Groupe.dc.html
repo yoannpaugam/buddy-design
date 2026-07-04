@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #E8E4DF; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 24px 16px; }
+  .pg-scroll::-webkit-scrollbar { display: none; }
+</style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#F7F4F0; border-radius:48px; overflow:hidden; position:relative; display:flex; flex-direction:column;">
+
+  <div style="padding:14px 24px 0; flex-shrink:0;">
+    <span style="font-weight:600; font-size:15px; color:#1A1A2E;">20:14</span>
+  </div>
+
+  <div style="padding:14px 24px 6px; flex-shrink:0; display:flex; align-items:center; gap:12px;">
+    <div onClick="{{ onBack }}" style="width:36px; height:36px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.06); flex-shrink:0;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; color:#1A1A2E;">Paramètres du groupe</div>
+  </div>
+
+  <div class="pg-scroll" style="flex:1; overflow-y:auto; padding:12px 24px 24px;">
+
+    <!-- identity -->
+    <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:22px;">
+      <div style="width:76px; height:76px; border-radius:22px; background:linear-gradient(135deg,#FF5C57,#FF8A7A); display:flex; align-items:center; justify-content:center; font-size:32px; margin-bottom:10px; position:relative;">
+        🎭
+        <div style="position:absolute; bottom:-4px; right:-4px; width:26px; height:26px; background:#1A1A2E; border-radius:50%; border:2.5px solid #F7F4F0; display:flex; align-items:center; justify-content:center;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
+      </div>
+      <input value="{{ groupName }}" onInput="{{ onNameInput }}" style="text-align:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; color:#1A1A2E; border:none; background:transparent; outline:none; border-bottom:1.5px dashed #E5E2DE; padding-bottom:4px;" />
+    </div>
+
+    <div style="font-size:11.5px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Général</div>
+    <div style="background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-bottom:22px;">
+      <div style="display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:1px solid #F2EFEA;">
+        <div style="width:36px; height:36px; border-radius:10px; background:#FFE8E7; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:16px;">🔔</div>
+        <div style="flex:1; font-family:'Poppins',sans-serif; font-weight:600; font-size:13.5px; color:#1A1A2E;">Notifications du groupe</div>
+        <div onClick="{{ onToggleNotifs }}" style="{{ notifsTrackStyle }}"><div style="{{ notifsThumbStyle }}"></div></div>
+      </div>
+      <div onClick="{{ onOpenInvite }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer;">
+        <div style="width:36px; height:36px; border-radius:10px; background:#EDE9FE; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:16px;">🔗</div>
+        <div style="flex:1; font-family:'Poppins',sans-serif; font-weight:600; font-size:13.5px; color:#1A1A2E;">Lien d'invitation</div>
+        <span style="font-size:12px; font-weight:600; color:{{ inviteLinkColor }};">{{ inviteLinkLabel }}</span>
+      </div>
+    </div>
+
+    <div style="font-size:11.5px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Membres</div>
+    <div style="background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-bottom:22px;">
+      <sc-for list="{{ members }}" as="m" hint-placeholder-count="5">
+        <div style="display:flex; align-items:center; gap:11px; padding:12px 14px; border-bottom:1px solid #F2EFEA;">
+          <div style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; color:#fff; flex-shrink:0; background:{{ m.color }};">{{ m.initial }}</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; color:#1A1A2E;">{{ m.name }}</div>
+            <div style="font-size:11px; color:#6B7280;">{{ m.role }}</div>
+          </div>
+          <sc-if value="{{ m.canRemove }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ m.onRemove }}" style="font-size:12px; font-weight:600; color:#FF5C57; cursor:pointer;">Retirer</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <div onClick="{{ onLeaveConfirm }}" style="text-align:center; padding:13px; font-family:'Poppins',sans-serif; font-weight:600; font-size:13.5px; color:#FF5C57; cursor:pointer;">Quitter le groupe</div>
+    <div onClick="{{ onDeleteConfirm }}" style="text-align:center; padding:6px; font-size:12.5px; color:#9A948C; cursor:pointer;">Supprimer le groupe</div>
+
+  </div>
+
+  <!-- confirm modal -->
+  <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCancelConfirm }}" style="position:absolute; inset:0; z-index:60; background:rgba(26,26,46,0.55); display:flex; align-items:center; justify-content:center; padding:0 28px;">
+      <div onClick="{{ stop }}" style="background:#fff; border-radius:22px; padding:24px 20px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+        <div style="font-size:32px; margin-bottom:10px;">{{ confirmEmoji }}</div>
+        <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:15.5px; color:#1A1A2E; margin-bottom:6px;">{{ confirmTitle }}</div>
+        <div style="font-size:12.5px; color:#6B7280; line-height:1.5; margin-bottom:18px;">{{ confirmText }}</div>
+        <div style="display:flex; gap:10px;">
+          <div onClick="{{ onCancelConfirm }}" style="flex:1; padding:13px; border-radius:14px; background:#F7F4F0; color:#1A1A2E; font-weight:600; font-size:13px; cursor:pointer;">Annuler</div>
+          <div onClick="{{ onConfirm }}" style="flex:1; padding:13px; border-radius:14px; background:#FF5C57; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">Confirmer</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      groupName: '🎭 Bande du Jeudi',
+      notifs: true,
+      inviteCopied: false,
+      members: [
+        { initial:'M', color:'#FF5C57', name:'Marc', role:'Créateur du groupe', removable:false },
+        { initial:'L', color:'#8B5CF6', name:'Léa', role:'Membre', removable:true },
+        { initial:'T', color:'#22C55E', name:'Tom', role:'Membre', removable:true },
+        { initial:'S', color:'#EC4899', name:'Sarah', role:'Membre', removable:true },
+        { initial:'C', color:'#F59E0B', name:'Chloé (toi)', role:'Membre', removable:false },
+      ],
+      confirmMode: null, // 'leave' | 'delete' | 'remove'
+      removeTarget: null,
+    };
+  }
+
+  nav(file){ try { (window.parent||window).postMessage({type:'omnav', file:file}, '*'); } catch(e){} }
+
+  renderVals(){
+    const S = this.state;
+    const members = S.members.map(m=>({
+      initial:m.initial, color:m.color, name:m.name, role:m.role, canRemove:m.removable,
+      onRemove: ()=>this.setState({confirmMode:'remove', removeTarget:m.name}),
+    }));
+
+    let confirmTitle='', confirmText='', confirmEmoji='⚠️', onConfirm=()=>{};
+    if (S.confirmMode==='leave') { confirmEmoji='👋'; confirmTitle='Quitter le groupe ?'; confirmText='Tu ne recevras plus les messages ni les events partagés dans ce groupe.'; onConfirm=()=>this.nav('uploads/buddy-design-kit/08-onglet-buddy.html'); }
+    else if (S.confirmMode==='delete') { confirmEmoji='🗑️'; confirmTitle='Supprimer le groupe ?'; confirmText='Cette action est définitive pour tous les membres. La discussion et l\u2019historique seront perdus.'; onConfirm=()=>this.nav('uploads/buddy-design-kit/08-onglet-buddy.html'); }
+    else if (S.confirmMode==='remove') { confirmEmoji='🚪'; confirmTitle='Retirer '+S.removeTarget+' ?'; confirmText=S.removeTarget+' ne fera plus partie du groupe et ne verra plus la conversation.'; onConfirm=()=>{ this.setState({ members: S.members.filter(m=>m.name!==S.removeTarget), confirmMode:null }); }; }
+
+    return {
+      onBack: ()=>this.nav('Groupe-Detail.dc.html'),
+      groupName: S.groupName, onNameInput:(e)=>this.setState({groupName:e.target.value}),
+      notifsTrackStyle: 'width:44px; height:26px; border-radius:14px; cursor:pointer; position:relative; background:'+(S.notifs?'#FF5C57':'#E5E2DE')+';',
+      notifsThumbStyle: 'width:20px; height:20px; border-radius:50%; background:#fff; position:absolute; top:3px; box-shadow:0 1px 3px rgba(0,0,0,0.2); left:'+(S.notifs?'21px':'3px')+';',
+      onToggleNotifs: ()=>this.setState({notifs:!S.notifs}),
+      onOpenInvite: ()=>this.setState({inviteCopied:true}),
+      inviteLinkLabel: S.inviteCopied ? 'Copié ✓' : 'Copier →',
+      inviteLinkColor: S.inviteCopied ? '#16A34A' : '#C9C4BE',
+      members,
+      onLeaveConfirm: ()=>this.setState({confirmMode:'leave'}),
+      onDeleteConfirm: ()=>this.setState({confirmMode:'delete'}),
+      confirmOpen: !!S.confirmMode, confirmEmoji, confirmTitle, confirmText,
+      onCancelConfirm: ()=>this.setState({confirmMode:null}),
+      onConfirm,
+      stop: (e)=>{ e.stopPropagation(); },
+    };
+  }
+}
+</script>
+</body>
+</html>

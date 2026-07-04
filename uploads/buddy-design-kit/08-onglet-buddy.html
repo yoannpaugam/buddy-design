@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Buddy — Onglet Buddy</title>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --coral: #FF5C57;
+    --coral-light: #FFE8E7;
+    --coral-mid: #FFB3B1;
+    --night: #1A1A2E;
+    --warm-white: #F7F4F0;
+    --gray: #6B7280;
+    --gray-light: #E5E2DE;
+    --white: #FFFFFF;
+    --purple: #8B5CF6;
+    --purple-light: #EDE9FE;
+    --green: #22C55E;
+    --green-light: #DCFCE7;
+    --amber: #F59E0B;
+    --amber-light: #FEF3C7;
+  }
+
+  body {
+    background: #E8E4DF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    padding: 24px 16px;
+  }
+
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--warm-white);
+    border-radius: 48px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    background: var(--warm-white);
+    padding: 14px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-weight: 600; font-size: 15px; color: var(--night); }
+  .status-icons { display: flex; gap: 6px; }
+  .status-icons svg { width: 16px; height: 16px; fill: var(--night); }
+
+  /* Header */
+  .header {
+    padding: 14px 24px 0;
+    flex-shrink: 0;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .page-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--night);
+  }
+  .header-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    background: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .icon-btn svg { width: 17px; height: 17px; color: var(--night); }
+  .icon-btn.notif-btn { position: relative; }
+  .notif-dot {
+    width: 8px; height: 8px;
+    background: var(--coral);
+    border-radius: 50%;
+    position: absolute;
+    top: 7px; right: 7px;
+    border: 2px solid var(--warm-white);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--gray-light);
+    border-radius: 14px;
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 4px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--gray);
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--white);
+    color: var(--night);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  /* Tab panels */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Scroll */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 24px 16px;
+    scrollbar-width: none;
+  }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  /* =====================
+     ONGLET — MES BUDDIES
+  ===================== */
+
+  /* Pending requests */
+  .pending-banner {
+    background: var(--amber-light);
+    border: 1.5px solid #FCD34D;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .pending-icon { font-size: 18px; flex-shrink: 0; }
+  .pending-text { flex: 1; font-size: 12px; color: #92400E; line-height: 1.4; }
+  .pending-text strong { font-weight: 700; }
+  .pending-cta {
+    font-size: 12px;
+    font-weight: 700;
+    color: #92400E;
+    white-space: nowrap;
+  }
+
+  /* Buddy card */
+  .buddy-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--gray-light);
+  }
+  .buddy-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .buddy-status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    position: absolute;
+    bottom: 0; right: 0;
+  }
+  .buddy-status-dot.online { background: var(--green); }
+  .buddy-status-dot.offline { background: var(--gray-light); }
+
+  .buddy-info { flex: 1; min-width: 0; }
+  .buddy-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--night);
+    margin-bottom: 2px;
+  }
+  .buddy-sub {
+    font-size: 11px;
+    color: var(--gray);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .buddy-sub .shared-event { color: var(--coral); font-weight: 600; }
+
+  .buddy-tags {
+    display: flex;
+    gap: 4px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+  }
+  .buddy-tag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+
+  .buddy-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .buddy-action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .buddy-action-btn svg { width: 15px; height: 15px; }
+  .btn-chat { background: var(--coral-light); }
+  .btn-chat svg { color: var(--coral); }
+  .btn-agenda { background: var(--purple-light); }
+  .btn-agenda svg { color: var(--purple); }
+
+  /* Section label */
+  .section-label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--gray);
+    margin: 16px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-size: 11px;
+  }
+
+  /* Add buddy CTA */
+  .add-buddy-btn {
+    background: transparent;
+    border: 2px dashed var(--gray-light);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--gray);
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  .add-buddy-btn svg { width: 16px; height: 16px; }
+
+  /* =====================
+     ONGLET — GROUPES
+  ===================== */
+  .group-card {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--gray-light);
+  }
+  .group-card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .group-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .group-info { flex: 1; }
+  .group-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--night);
+    margin-bottom: 2px;
+  }
+  .group-members { font-size: 11px; color: var(--gray); }
+  .group-unread {
+    width: 22px;
+    height: 22px;
+    background: var(--coral);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .group-avatars { display: flex; margin-bottom: 10px; }
+  .g-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    margin-left: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+  }
+  .g-avatar:first-child { margin-left: 0; }
+
+  .group-last-msg {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.4;
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-light);
+  }
+  .group-last-msg strong { color: var(--night); font-weight: 600; }
+
+  .group-next-event {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--warm-white);
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-top: 10px;
+  }
+  .group-next-event-icon { font-size: 14px; }
+  .group-next-event-text { font-size: 11px; color: var(--night); }
+  .group-next-event-text strong { font-weight: 600; color: var(--coral); }
+
+  .create-group-btn {
+    background: transparent;
+    border: 2px dashed var(--gray-light);
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .create-group-btn svg { width: 22px; height: 22px; color: var(--gray); }
+  .create-group-btn span { font-size: 13px; font-weight: 600; color: var(--gray); }
+  .create-group-btn small { font-size: 11px; color: var(--gray); }
+
+  /* =====================
+     ONGLET — DEMANDES
+  ===================== */
+  .request-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid var(--gray-light);
+  }
+  .request-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .request-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .request-info { flex: 1; }
+  .request-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--night);
+    margin-bottom: 2px;
+  }
+  .request-context { font-size: 11.5px; color: var(--gray); line-height: 1.4; }
+  .request-context strong { color: var(--night); font-weight: 600; }
+  .request-time { font-size: 10px; color: var(--gray); white-space: nowrap; }
+
+  .request-common {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .common-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 10px;
+    background: var(--warm-white);
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .request-actions { display: flex; gap: 8px; }
+  .btn-decline {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--warm-white);
+    border: 1.5px solid var(--gray-light);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+  }
+  .btn-accept {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--coral);
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px 20px;
+  }
+  .empty-emoji { font-size: 40px; margin-bottom: 12px; }
+  .empty-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--night);
+    margin-bottom: 6px;
+  }
+  .empty-sub { font-size: 12px; color: var(--gray); line-height: 1.5; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    background: var(--white);
+    border-top: 1px solid var(--gray-light);
+    padding: 10px 0 24px;
+    display: flex;
+    justify-content: space-around;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 16px;
+    position: relative;
+  }
+  .nav-item svg { width: 22px; height: 22px; color: var(--gray); }
+  .nav-item.active svg { color: var(--coral); }
+  .nav-label { font-size: 10px; font-weight: 500; color: var(--gray); }
+  .nav-item.active .nav-label { color: var(--coral); font-weight: 600; }
+  .nav-dot { width: 4px; height: 4px; background: var(--coral); border-radius: 50%; position: absolute; bottom: -2px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <div class="status-bar">
+    <span class="time">20:14</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-top">
+      <div class="page-title">Buddy</div>
+      <div class="header-actions">
+        <div class="icon-btn notif-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="buddies" onclick="switchTab('buddies')">Mes Buddies</div>
+      <div class="tab" data-tab="groupes" onclick="switchTab('groupes')">Groupes</div>
+      <div class="tab" data-tab="demandes" onclick="switchTab('demandes')">Demandes <span style="background:var(--coral);color:white;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:2px;">2</span></div>
+    </div>
+  </div>
+
+  <div class="scroll-area">
+
+    <!-- ====== PANEL: MES BUDDIES ====== -->
+    <div class="tab-panel active" id="panel-buddies">
+
+      <div class="pending-banner">
+        <span class="pending-icon">👋</span>
+        <div class="pending-text"><strong>2 demandes</strong> en attente — des gens que tu as croisés à des events</div>
+      </div>
+
+      <div class="section-label">En ligne maintenant</div>
+
+      <div class="buddy-card">
+        <div class="buddy-avatar" style="background:#8B5CF6;">
+          L
+          <div class="buddy-status-dot online"></div>
+        </div>
+        <div class="buddy-info">
+          <div class="buddy-name">Léa</div>
+          <div class="buddy-sub">Regarde <span class="shared-event">Les Impromptus du Jeudi</span></div>
+          <div class="buddy-tags">
+            <span class="buddy-tag" style="background:var(--coral-light);color:var(--coral);">🎭 Théâtre</span>
+            <span class="buddy-tag" style="background:var(--purple-light);color:var(--purple);">🎵 Concerts</span>
+          </div>
+        </div>
+        <div class="buddy-actions">
+          <div class="buddy-action-btn btn-chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div class="buddy-action-btn btn-agenda">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="buddy-card">
+        <div class="buddy-avatar" style="background:#22C55E;">
+          T
+          <div class="buddy-status-dot online"></div>
+        </div>
+        <div class="buddy-info">
+          <div class="buddy-name">Tom</div>
+          <div class="buddy-sub">Explore les events de ce week-end</div>
+          <div class="buddy-tags">
+            <span class="buddy-tag" style="background:var(--green-light);color:#16A34A;">🎲 Jeux</span>
+            <span class="buddy-tag" style="background:var(--amber-light);color:#B45309;">⚽ Sport</span>
+          </div>
+        </div>
+        <div class="buddy-actions">
+          <div class="buddy-action-btn btn-chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div class="buddy-action-btn btn-agenda">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">Tous mes Buddies · 8</div>
+
+      <div class="buddy-card">
+        <div class="buddy-avatar" style="background:#FF5C57;">
+          M
+          <div class="buddy-status-dot offline"></div>
+        </div>
+        <div class="buddy-info">
+          <div class="buddy-name">Marc</div>
+          <div class="buddy-sub">Actif il y a 2h · 3 events en commun</div>
+          <div class="buddy-tags">
+            <span class="buddy-tag" style="background:var(--coral-light);color:var(--coral);">🎭 Théâtre</span>
+            <span class="buddy-tag" style="background:var(--green-light);color:#16A34A;">🌿 Marchés</span>
+          </div>
+        </div>
+        <div class="buddy-actions">
+          <div class="buddy-action-btn btn-chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div class="buddy-action-btn btn-agenda">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="buddy-card">
+        <div class="buddy-avatar" style="background:#F59E0B;">
+          A
+          <div class="buddy-status-dot offline"></div>
+        </div>
+        <div class="buddy-info">
+          <div class="buddy-name">Antoine</div>
+          <div class="buddy-sub">Actif hier · 1 event en commun</div>
+          <div class="buddy-tags">
+            <span class="buddy-tag" style="background:#EDE9FE;color:var(--purple);">🎵 Concerts</span>
+          </div>
+        </div>
+        <div class="buddy-actions">
+          <div class="buddy-action-btn btn-chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div class="buddy-action-btn btn-agenda">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-buddy-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Inviter un ami sur Buddy
+      </div>
+
+    </div>
+
+    <!-- ====== PANEL: GROUPES ====== -->
+    <div class="tab-panel" id="panel-groupes">
+
+      <div class="group-card">
+        <div class="group-card-top">
+          <div class="group-icon" style="background:var(--coral-light);">🎭</div>
+          <div class="group-info">
+            <div class="group-name">Bande du Jeudi</div>
+            <div class="group-members">5 membres · actif aujourd'hui</div>
+          </div>
+          <div class="group-unread">3</div>
+        </div>
+        <div class="group-avatars">
+          <div class="g-avatar" style="background:#FF5C57;">M</div>
+          <div class="g-avatar" style="background:#8B5CF6;">L</div>
+          <div class="g-avatar" style="background:#22C55E;">T</div>
+          <div class="g-avatar" style="background:#F59E0B;">A</div>
+          <div class="g-avatar" style="background:#EC4899;">S</div>
+        </div>
+        <div class="group-last-msg"><strong>Léa :</strong> On se retrouve directement là-bas ? 🎭</div>
+        <div class="group-next-event">
+          <span class="group-next-event-icon">📅</span>
+          <div class="group-next-event-text">Prochain event : <strong>Les Impromptus du Jeudi</strong> · dans 2 jours</div>
+        </div>
+      </div>
+
+      <div class="group-card">
+        <div class="group-card-top">
+          <div class="group-icon" style="background:var(--green-light);">🎲</div>
+          <div class="group-info">
+            <div class="group-name">Jeux & Café</div>
+            <div class="group-members">3 membres · actif cette semaine</div>
+          </div>
+        </div>
+        <div class="group-avatars">
+          <div class="g-avatar" style="background:#FF5C57;">M</div>
+          <div class="g-avatar" style="background:#F59E0B;">A</div>
+          <div class="g-avatar" style="background:#22C55E;">T</div>
+        </div>
+        <div class="group-last-msg"><strong>Antoine :</strong> Soirée Terraforming Mars la semaine prochaine ?</div>
+        <div class="group-next-event">
+          <span class="group-next-event-icon">💭</span>
+          <div class="group-next-event-text">Pas encore de sortie planifiée — <strong style="color:var(--coral);">proposer un event</strong></div>
+        </div>
+      </div>
+
+      <div class="create-group-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
+        <span>Créer un groupe</span>
+        <small>Réunis des Buddies autour d'un centre d'intérêt</small>
+      </div>
+
+    </div>
+
+    <!-- ====== PANEL: DEMANDES ====== -->
+    <div class="tab-panel" id="panel-demandes">
+
+      <div class="request-card">
+        <div class="request-top">
+          <div class="request-avatar" style="background:#8B5CF6;">L</div>
+          <div class="request-info">
+            <div class="request-name">Léa</div>
+            <div class="request-context">Vous étiez tous les deux aux <strong>Impromptus du Jeudi</strong> le 3 juillet</div>
+          </div>
+          <div class="request-time">Il y a 2h</div>
+        </div>
+        <div class="request-common">
+          <div class="common-tag">🎭 Théâtre en commun</div>
+          <div class="common-tag">🎵 Concerts en commun</div>
+          <div class="common-tag">📍 2 km de toi</div>
+        </div>
+        <div class="request-actions">
+          <div class="btn-decline">Refuser</div>
+          <div class="btn-accept">Accepter ✓</div>
+        </div>
+      </div>
+
+      <div class="request-card">
+        <div class="request-top">
+          <div class="request-avatar" style="background:#22C55E;">R</div>
+          <div class="request-info">
+            <div class="request-name">Romain</div>
+            <div class="request-context">A répondu à ton <strong>appel ouvert</strong> sur Jazz Session</div>
+          </div>
+          <div class="request-time">Hier</div>
+        </div>
+        <div class="request-common">
+          <div class="common-tag">🎵 Concerts en commun</div>
+          <div class="common-tag">📍 4 km de toi</div>
+        </div>
+        <div class="request-actions">
+          <div class="btn-decline">Refuser</div>
+          <div class="btn-accept">Accepter ✓</div>
+        </div>
+      </div>
+
+      <div class="request-card">
+        <div class="request-top">
+          <div class="request-avatar" style="background:#F59E0B;">Y</div>
+          <div class="request-info">
+            <div class="request-name">Yanis</div>
+            <div class="request-context">Suggéré par Buddy · <strong>3 goûts en commun</strong></div>
+          </div>
+          <div class="request-time">Il y a 5h</div>
+        </div>
+        <div class="request-common">
+          <div class="common-tag">🎲 Jeux en commun</div>
+          <div class="common-tag">🎤 Stand-up en commun</div>
+          <div class="common-tag">📍 0,9 km de toi</div>
+        </div>
+        <div class="request-actions">
+          <div class="btn-decline">Ignorer</div>
+          <div class="btn-accept">Voir le profil</div>
+        </div>
+      </div>
+
+      <div class="request-card">
+        <div class="request-top">
+          <div class="request-avatar" style="background:#EC4899;">J</div>
+          <div class="request-info">
+            <div class="request-name">Julie</div>
+            <div class="request-context">Vous étiez tous les deux à la <strong>Vente de plantes — Racines</strong></div>
+          </div>
+          <div class="request-time">Il y a 1 jour</div>
+        </div>
+        <div class="request-common">
+          <div class="common-tag">🌿 Sorties nature en commun</div>
+          <div class="common-tag">📍 0,8 km de toi</div>
+        </div>
+        <div class="request-actions">
+          <div class="btn-decline">Refuser</div>
+          <div class="btn-accept">Accepter ✓</div>
+        </div>
+      </div>
+
+      <div class="request-card">
+        <div class="request-top">
+          <div class="request-avatar" style="background:#10B981;">P</div>
+          <div class="request-info">
+            <div class="request-name">Paul</div>
+            <div class="request-context">Membre de <strong>Bande du Jeudi</strong> · t'invite à rejoindre le groupe</div>
+          </div>
+          <div class="request-time">Il y a 2 jours</div>
+        </div>
+        <div class="request-common">
+          <div class="common-tag">🎭 Théâtre en commun</div>
+          <div class="common-tag">👥 3 amis en commun</div>
+        </div>
+        <div class="request-actions">
+          <div class="btn-decline">Ignorer</div>
+          <div class="btn-accept">Rejoindre</div>
+        </div>
+      </div>
+
+      <div class="empty-state" style="padding-top: 20px;">
+        <div class="empty-emoji">✅</div>
+        <div class="empty-title">C'est tout pour l'instant</div>
+        <div class="empty-sub">Les nouvelles demandes apparaissent ici quand tu croises des gens à des events ou que tu réponds à un appel ouvert.</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z"/></svg>
+      <span class="nav-label">Accueil</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span class="nav-label">Explorer</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="nav-label">Agenda</span>
+    </div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span class="nav-label">Messages</span>
+      <div class="nav-dot"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector('.tab[data-tab="' + tabName + '"]').classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + tabName).classList.add('active');
+  }
+</script>
+
+
+<script>
+/* OM_NAV_WIRED */
+(function(){
+  var MAP = {"Accueil":"Accueil.dc.html","Explorer":"Explorer.dc.html","Agenda":"Agenda.dc.html","Messages":"Messages-Liste.dc.html"};
+  function omnav(file){
+    try { window.parent && window.parent.postMessage({type:'omnav', file:file}, '*'); } catch(e){}
+  }
+  window.__omnav = omnav;
+  document.querySelectorAll('.nav-item').forEach(function(it){
+    var lbl = it.querySelector('.nav-label');
+    if(!lbl) return;
+    var target = MAP[lbl.textContent.trim()];
+    if(!target) return;
+    it.style.cursor = 'pointer';
+    it.addEventListener('click', function(){ omnav(target); });
+  });
+})();
+</script>
+
+<script>
+/* OM_ACT2_WIRED */
+(function(){
+  function omnav(file){ try{ (window.parent||window).postMessage({type:'omnav',file:file},'*'); }catch(e){} }
+  var acts = [[".notif-btn","Notifications.dc.html"],[".create-group-btn","Creer-Groupe.dc.html"],[".add-buddy-btn","Rechercher-Buddy.dc.html"]];
+  acts.forEach(function(pair){
+    document.querySelectorAll(pair[0]).forEach(function(el){
+      el.style.cursor='pointer';
+      el.addEventListener('click', function(ev){ ev.stopPropagation(); omnav(pair[1]); });
+    });
+  });
+})();
+</script>
+
+<script>
+/* OM_PLUS_WIRED */
+(function(){
+  function omnav(file){ try{ (window.parent||window).postMessage({type:'omnav',file:file},'*'); }catch(e){} }
+  var actions = document.querySelector('.header-actions');
+  if (actions) {
+    var btns = actions.querySelectorAll('.icon-btn');
+    var plusBtn = btns[1]; // second icon-btn = the "+" (first is notif-btn)
+    if (plusBtn) {
+      plusBtn.style.cursor = 'pointer';
+      plusBtn.addEventListener('click', function(ev){ ev.stopPropagation(); omnav('Rechercher-Buddy.dc.html'); });
+    }
+  }
+  document.querySelectorAll('.group-card').forEach(function(card){
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(ev){ ev.stopPropagation(); omnav('Groupe-Detail.dc.html'); });
+  });
+})();
+</script>
+</body>
+</html>

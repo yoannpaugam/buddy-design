@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Buddy — Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --coral: #FF5C57;
+    --coral-light: #FFE8E7;
+    --night: #1A1A2E;
+    --warm-white: #F7F4F0;
+    --gray: #6B7280;
+    --gray-light: #E5E2DE;
+    --white: #FFFFFF;
+    --purple: #8B5CF6;
+    --purple-light: #EDE9FE;
+    --green: #22C55E;
+    --green-light: #DCFCE7;
+    --amber: #F59E0B;
+    --amber-light: #FEF3C7;
+  }
+
+  body {
+    background: #E8E4DF;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    padding: 24px 12px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .phone-label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  .phone {
+    width: 320px;
+    height: 693px;
+    background: var(--warm-white);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.07);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .status-bar {
+    padding: 12px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-weight: 600; font-size: 14px; }
+  .status-icons { display: flex; gap: 5px; }
+  .status-icons svg { width: 14px; height: 14px; }
+
+  /* Progress dots */
+  .progress-bar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 0 0;
+    flex-shrink: 0;
+  }
+  .progress-dot {
+    width: 6px; height: 6px;
+    border-radius: 3px;
+    background: var(--gray-light);
+    transition: width 0.3s;
+  }
+  .progress-dot.active {
+    width: 20px;
+    background: var(--coral);
+  }
+  .progress-dot.done { background: var(--coral); opacity: 0.4; }
+
+  /* Shared CTA bar */
+  .cta-bar {
+    padding: 12px 24px 28px;
+    flex-shrink: 0;
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: var(--coral);
+    border-radius: 16px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: white;
+    letter-spacing: -0.2px;
+  }
+  .btn-skip {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  /* ================================
+     ÉCRAN 1 — BIENVENUE
+  ================================ */
+  .screen-welcome .status-bar { background: var(--night); color: white; }
+  .screen-welcome .status-icons svg { fill: white; }
+
+  .welcome-hero {
+    background: linear-gradient(160deg, var(--night) 0%, #2D2255 100%);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 32px 20px;
+    text-align: center;
+  }
+  .welcome-logo-big {
+    font-family: 'Caprasimo', cursive;
+    font-weight: 400;
+    color: var(--coral);
+    font-size: 52px;
+    color: white;
+    letter-spacing: -2px;
+    margin-bottom: 4px;
+  }
+  .welcome-logo-big span { color: var(--coral); }
+  .welcome-tagline {
+    font-size: 15px;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 36px;
+    line-height: 1.5;
+  }
+  .welcome-pills {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  .welcome-pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+  }
+  .welcome-pill-icon { font-size: 22px; flex-shrink: 0; }
+  .welcome-pill-text {}
+  .welcome-pill-title { font-size: 13px; font-weight: 700; color: white; margin-bottom: 1px; }
+  .welcome-pill-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  .welcome-cta {
+    padding: 16px 24px 28px;
+    background: var(--night);
+    flex-shrink: 0;
+  }
+  .btn-primary-dark {
+    width: 100%;
+    padding: 15px;
+    background: var(--coral);
+    border-radius: 16px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: white;
+  }
+  .already-account {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+  }
+  .already-account strong { color: rgba(255,255,255,0.75); }
+
+  /* ================================
+     ÉCRAN 2 — VILLE & RAYON
+  ================================ */
+  .screen-city .status-bar { background: var(--warm-white); color: var(--night); }
+  .screen-city .status-icons svg { fill: var(--night); }
+
+  .onboard-header {
+    padding: 12px 24px 0;
+    flex-shrink: 0;
+  }
+  .onboard-step {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--coral);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  .onboard-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--night);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .onboard-sub {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .onboard-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 24px;
+    scrollbar-width: none;
+  }
+  .onboard-body::-webkit-scrollbar { display: none; }
+
+  /* Location search */
+  .location-search {
+    background: var(--white);
+    border: 2px solid var(--coral);
+    border-radius: 14px;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .location-search svg { width: 17px; height: 17px; color: var(--coral); flex-shrink: 0; }
+  .location-search-text { font-size: 15px; font-weight: 600; color: var(--night); }
+
+  .location-btn {
+    background: var(--warm-white);
+    border: 1.5px solid var(--gray-light);
+    border-radius: 14px;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .location-btn svg { width: 17px; height: 17px; color: var(--gray); flex-shrink: 0; }
+  .location-btn-text { font-size: 13px; color: var(--gray); font-weight: 500; }
+
+  /* Radius slider */
+  .radius-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .radius-label { font-size: 13px; font-weight: 600; color: var(--night); }
+  .radius-value {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--coral);
+  }
+  .radius-value span { font-size: 13px; font-weight: 500; color: var(--gray); }
+
+  .slider-track {
+    width: 100%;
+    height: 6px;
+    background: var(--gray-light);
+    border-radius: 3px;
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .slider-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--coral); border-radius: 3px; width: 35%; }
+  .slider-thumb {
+    position: absolute; top: 50%; left: 35%;
+    transform: translate(-50%, -50%);
+    width: 22px; height: 22px;
+    background: white; border: 3px solid var(--coral);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(255,92,87,0.3);
+  }
+  .slider-sub { font-size: 11px; color: var(--gray); text-align: center; margin-top: 8px; }
+
+  /* ================================
+     ÉCRAN 3 — CENTRES D'INTÉRÊT
+  ================================ */
+  .screen-interests .status-bar { background: var(--warm-white); color: var(--night); }
+  .screen-interests .status-icons svg { fill: var(--night); }
+
+  .interest-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .interest-item {
+    background: var(--white);
+    border: 2px solid var(--gray-light);
+    border-radius: 14px;
+    padding: 14px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    cursor: pointer;
+  }
+  .interest-item.selected {
+    background: var(--coral-light);
+    border-color: var(--coral);
+  }
+  .interest-emoji { font-size: 24px; }
+  .interest-name {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--gray);
+    text-align: center;
+    line-height: 1.3;
+  }
+  .interest-item.selected .interest-name { color: var(--coral); }
+  .interest-check {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 16px; height: 16px;
+    background: var(--coral);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .interest-check svg { width: 9px; height: 9px; color: white; }
+  .selected-count {
+    text-align: center;
+    font-size: 12px;
+    color: var(--gray);
+    margin-bottom: 12px;
+  }
+  .selected-count strong { color: var(--coral); }
+
+  /* ================================
+     ÉCRAN 4 — PROFIL RAPIDE
+  ================================ */
+  .screen-profile .status-bar { background: var(--warm-white); color: var(--night); }
+  .screen-profile .status-icons svg { fill: var(--night); }
+
+  .avatar-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .avatar-large {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--coral) 0%, #FF8A7A 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: white;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .avatar-edit-badge {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 26px; height: 26px;
+    background: var(--night);
+    border-radius: 50%;
+    border: 2.5px solid var(--warm-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .avatar-edit-badge svg { width: 12px; height: 12px; color: white; }
+  .avatar-hint { font-size: 11.5px; color: var(--gray); }
+
+  .form-field {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .form-input {
+    width: 100%;
+    background: var(--white);
+    border: 1.5px solid var(--gray-light);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--night);
+  }
+  .form-input.active-input { border-color: var(--coral); }
+  .form-textarea {
+    width: 100%;
+    background: var(--white);
+    border: 2px solid var(--coral);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: var(--night);
+    line-height: 1.5;
+    height: 70px;
+    resize: none;
+  }
+  .form-counter { font-size: 10px; color: var(--gray); text-align: right; margin-top: 4px; }
+
+  .privacy-note {
+    background: var(--green-light);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .privacy-note svg { width: 15px; height: 15px; color: #16A34A; flex-shrink: 0; }
+  .privacy-note-text { font-size: 11px; color: #166534; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<!-- ====== ÉCRAN 1 : BIENVENUE ====== -->
+<div class="phone-wrap">
+  <div class="phone-label">① Bienvenue</div>
+  <div class="phone screen-welcome">
+    <div class="status-bar">
+      <span class="time">20:14</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+      </div>
+    </div>
+
+    <div class="welcome-hero">
+      <div class="welcome-logo-big">Buddy</div>
+      <div class="welcome-tagline">Sors plus.<br>Seul, c'est moins drôle.</div>
+      <div class="welcome-pills">
+        <div class="welcome-pill">
+          <span class="welcome-pill-icon">🔍</span>
+          <div class="welcome-pill-text">
+            <div class="welcome-pill-title">Trouve des events près de toi</div>
+            <div class="welcome-pill-sub">Concerts, théâtre, marchés, tournois… tout ce qui se passe</div>
+          </div>
+        </div>
+        <div class="welcome-pill">
+          <span class="welcome-pill-icon">👋</span>
+          <div class="welcome-pill-text">
+            <div class="welcome-pill-title">Lance un appel, trouve quelqu'un</div>
+            <div class="welcome-pill-sub">Un inconnu devient un Buddy, parfois pour longtemps</div>
+          </div>
+        </div>
+        <div class="welcome-pill">
+          <span class="welcome-pill-icon">📅</span>
+          <div class="welcome-pill-text">
+            <div class="welcome-pill-title">Sortez ensemble, planifiez ensemble</div>
+            <div class="welcome-pill-sub">Agenda partagé, groupes, tout au même endroit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="welcome-cta">
+      <div class="btn-primary-dark">Créer mon compte</div>
+      <div class="already-account">Déjà un compte ? <strong>Se connecter</strong></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== ÉCRAN 2 : VILLE & RAYON ====== -->
+<div class="phone-wrap">
+  <div class="phone-label">② Ma ville</div>
+  <div class="phone screen-city">
+    <div class="status-bar" style="background:var(--warm-white);">
+      <span class="time" style="color:var(--night);">20:14</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24" fill="var(--night)"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+        <svg viewBox="0 0 24 24" fill="var(--night)"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+
+    <div class="onboard-header">
+      <div class="onboard-step">Étape 2 sur 4</div>
+      <div class="onboard-title">Tu es où ?</div>
+      <div class="onboard-sub">Buddy adapte les events à ta localisation. Tu pourras la changer à tout moment.</div>
+    </div>
+
+    <div class="onboard-body">
+      <div class="location-search">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <span class="location-search-text">Nantes</span>
+      </div>
+
+      <div class="location-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span class="location-btn-text">Utiliser ma position GPS</span>
+      </div>
+
+      <div class="radius-label-row">
+        <span class="radius-label">Rayon de recherche par défaut</span>
+        <span class="radius-value">5 <span>km</span></span>
+      </div>
+      <div class="slider-track">
+        <div class="slider-fill"></div>
+        <div class="slider-thumb"></div>
+      </div>
+      <div class="slider-sub">Tu pourras affiner à chaque recherche</div>
+    </div>
+
+    <div class="cta-bar">
+      <div class="btn-primary">Continuer →</div>
+      <div class="btn-skip">Passer cette étape</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== ÉCRAN 3 : CENTRES D'INTÉRÊT ====== -->
+<div class="phone-wrap">
+  <div class="phone-label">③ Mes goûts</div>
+  <div class="phone screen-interests">
+    <div class="status-bar" style="background:var(--warm-white);">
+      <span class="time" style="color:var(--night);">20:14</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24" fill="var(--night)"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+        <svg viewBox="0 0 24 24" fill="var(--night)"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+    </div>
+
+    <div class="onboard-header">
+      <div class="onboard-step">Étape 3 sur 4</div>
+      <div class="onboard-title">Qu'est-ce qui te fait sortir ?</div>
+      <div class="onboard-sub">Choisis au moins 2. Buddy te proposera des events qui te ressemblent.</div>
+    </div>
+
+    <div class="onboard-body">
+      <div class="selected-count">
+        <strong>3 sélectionnés</strong> · choisissez au moins 2
+      </div>
+      <div class="interest-grid">
+        <div class="interest-item selected">
+          <div class="interest-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="interest-emoji">🎭</span>
+          <span class="interest-name">Théâtre</span>
+        </div>
+        <div class="interest-item selected">
+          <div class="interest-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="interest-emoji">🎵</span>
+          <span class="interest-name">Concerts</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">🎨</span>
+          <span class="interest-name">Expo & Art</span>
+        </div>
+        <div class="interest-item selected">
+          <div class="interest-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="interest-emoji">🎲</span>
+          <span class="interest-name">Jeux de société</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">🌿</span>
+          <span class="interest-name">Marchés</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">⚽</span>
+          <span class="interest-name">Sport</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">🏛️</span>
+          <span class="interest-name">Histoire</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">🍽️</span>
+          <span class="interest-name">Gastronomie</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">📚</span>
+          <span class="interest-name">Conférences</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">🕺</span>
+          <span class="interest-name">Danse</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">🎤</span>
+          <span class="interest-name">Stand-up</span>
+        </div>
+        <div class="interest-item">
+          <span class="interest-emoji">🌙</span>
+          <span class="interest-name">Nocturnes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-bar">
+      <div class="btn-primary">Continuer →</div>
+      <div class="btn-skip">Passer cette étape</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== ÉCRAN 4 : PROFIL RAPIDE ====== -->
+<div class="phone-wrap">
+  <div class="phone-label">④ Mon profil</div>
+  <div class="phone screen-profile">
+    <div class="status-bar" style="background:var(--warm-white);">
+      <span class="time" style="color:var(--night);">20:14</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24" fill="var(--night)"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5L20.5 10.5C17.5 7.5 6.5 7.5 3.5 10.5L1.5 8.5Z"/><path d="M5.5 12.5C7.5 10.5 16.5 10.5 18.5 12.5L16.5 14.5C15 13 9 13 7.5 14.5L5.5 12.5Z"/><circle cx="12" cy="18" r="2"/></svg>
+        <svg viewBox="0 0 24 24" fill="var(--night)"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+    </div>
+
+    <div class="onboard-header">
+      <div class="onboard-step">Étape 4 sur 4</div>
+      <div class="onboard-title">Comment tu t'appelles ?</div>
+      <div class="onboard-sub">Les gens verront ça quand tu rejoins un event ou que tu lances un appel.</div>
+    </div>
+
+    <div class="onboard-body">
+
+      <div class="avatar-picker">
+        <div class="avatar-large">
+          T
+          <div class="avatar-edit-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+        </div>
+        <div class="avatar-hint">Ajouter une photo (optionnel)</div>
+      </div>
+
+      <div class="form-field">
+        <div class="form-label">Prénom</div>
+        <div class="form-input active-input" style="border-color:var(--coral);color:var(--night);font-weight:600;">Thomas</div>
+      </div>
+
+      <div class="form-field">
+        <div class="form-label">Bio courte <span style="font-weight:400;color:var(--gray);">(optionnel)</span></div>
+        <textarea class="form-textarea" readonly>Fan de théâtre et de concerts. Toujours partant pour sortir le soir 🎭</textarea>
+        <div class="form-counter">62 / 140</div>
+      </div>
+
+      <div class="privacy-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="privacy-note-text">Seul ton prénom et ta bio sont visibles. Ton nom complet et ton email restent privés.</div>
+      </div>
+
+    </div>
+
+    <div class="cta-bar">
+      <div class="btn-primary">C'est parti ! 🎉</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
