@@ -116,9 +116,45 @@ const RULES = [
 // pluriels acceptés : « expositions », « concerts »…
 const RULES_PL = RULES.map(([c, re]) => [c, new RegExp(re.source.replace(/\)\\b$/, ')s?\\b'))]);
 
+// Vocabulaire officiel des types de l'agenda (types_libelles / categorie_N) → catégorie Buddy.
+// Clés = début du libellé normalisé (couvre aussi les pluriels de l'agenda des bibliothèques).
+const TYPE_MAP = [
+  ['concert', 'concert'],
+  ['theatre', 'theatre'],
+  ['cirque', 'theatre'],
+  ['contes', 'theatre'],
+  ['danse', 'danse'],
+  ['projection', 'cinema'],
+  ['cinema', 'cinema'],
+  ['jeux', 'jeux'],
+  ['evenement sportif', 'sport'],
+  ['sport', 'sport'],
+  ['marche', 'marche'],
+  ['salon', 'marche'],
+  ['stage', 'atelier'],
+  ['atelier', 'atelier'],
+  ['exposition', 'expo'],
+  ['conference', 'rencontre'],
+  ['rencontre', 'rencontre'],
+  ['visite', 'patrimoine'],
+  ['defile', 'fete'],
+  ['fete', 'fete'],
+];
+// Quand un event porte plusieurs types, le plus spécifique l'emporte (ordre ci-dessous).
+const PRIORITY = ['concert', 'theatre', 'danse', 'cinema', 'jeux', 'sport', 'marche', 'atelier', 'expo', 'rencontre', 'patrimoine', 'fete'];
+
 export function categorize({ types = [], themes = [], title = '', extra = [] }) {
-  const fields = [types.join(' '), extra.join(' '), title, themes.join(' ')].map(normalize);
-  for (const field of fields) {
+  const labels = [...types, ...extra].map(normalize).filter(Boolean);
+  // un programme qui coche presque tout (festival, quinzaine) = une fête
+  if (types.length >= 4) return 'fete';
+  const cats = new Set();
+  for (const l of labels) {
+    const hit = TYPE_MAP.find(([k]) => l.startsWith(k));
+    if (hit) cats.add(hit[1]);
+  }
+  if (cats.size) return PRIORITY.find((c) => cats.has(c));
+  // pas de type exploitable : mots-clés du titre puis des thèmes
+  for (const field of [title, themes.join(' ')].map(normalize)) {
     if (!field) continue;
     for (const [cat, re] of RULES_PL) if (re.test(field)) return cat;
   }
