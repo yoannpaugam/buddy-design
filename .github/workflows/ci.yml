@@ -19,8 +19,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - name: Collecter les événements
+      - name: Collecter les événements et les lieux
         run: npm run ingest
+        env:
+          OPENAGENDA_KEY: ${{ secrets.OPENAGENDA_KEY }}
+      - name: TEMP rapport + sondage du catalogue Nantes
+        run: |
+          cat public/data/ingest-report.json | head -c 12000
+          node -e "const p=require('./public/data/places.json');const m=p.places.filter(x=>x.kind==='marche');console.log('MARCHES',m.length);for(const x of m)console.log(JSON.stringify([x.name,x.hours,x.tags]));const e=require('./public/data/events.json');console.log('EVENTS',e.events.length,'by source',JSON.stringify(e.events.reduce((a,x)=>(a[x.source]=(a[x.source]||0)+1,a),{})));console.log('BROC',e.events.filter(x=>/brocante|vide.?grenier|braderie|puces/i.test(x.title)).length)"
+          for q in march%C3%A9 brocante vide-grenier bar; do curl -s "https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets?where=search(%22$q%22)&limit=15&select=dataset_id" ; echo; done
       - name: Résumé de la collecte
         run: |
           {

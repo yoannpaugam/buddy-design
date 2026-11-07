@@ -32,9 +32,9 @@ export default defineConfig({
         runtimeCaching: [
           {
             // vrais événements : réseau d'abord, dernière version connue hors ligne
-            urlPattern: ({ url }) => url.pathname.endsWith('/data/events.json'),
+            urlPattern: ({ url }) => /\/data\/(events|places)\.json$/.test(url.pathname),
             handler: 'NetworkFirst',
-            options: { cacheName: 'events', networkTimeoutSeconds: 6, expiration: { maxEntries: 2 } },
+            options: { cacheName: 'events', networkTimeoutSeconds: 6, expiration: { maxEntries: 4 } },
           },
           {
             urlPattern: /^https:\/\/img\.openagenda\.com\//,
