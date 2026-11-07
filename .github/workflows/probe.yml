@@ -1,0 +1,25 @@
+name: probe-donnees
+on:
+  push:
+    branches: [ingest-probe]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p probe
+          B=https://data.nantesmetropole.fr/api/explore/v2.1
+          curl -sS "$B/catalog/datasets?where=search(%22agenda%22)&limit=50&select=dataset_id,metas.default.title,metas.default.records_count,metas.default.modified" -o probe/catalog.json || true
+          for D in 244400404_agenda-evenements-nantes-metropole_v2 244400404_agenda-animations-culturelles-bibliotheque-municipale-nantes; do
+            curl -sS "$B/catalog/datasets/$D" -o probe/meta-$D.json || true
+            curl -sS "$B/catalog/datasets/$D/records?limit=8" -o probe/sample-$D.json || true
+          done
+          curl -sS -o probe/openagenda-nokey.json -w "%{http_code}\n" "https://api.openagenda.com/v2/agendas/82470621/events?size=2" > probe/openagenda-status.txt || true
+          ls -la probe
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add probe && git commit -m "probe: échantillons de données" && git push
