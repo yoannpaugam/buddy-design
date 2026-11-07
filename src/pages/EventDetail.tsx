@@ -4,7 +4,7 @@ import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import { useStore } from '../store/store';
 import { catById, venueById } from '../data/catalog';
-import { fmtDayLong, fmtKm, fmtTime, isPast, priceLabel, walkMin, relTime } from '../lib/logic';
+import { fmtDayLong, fmtDayShort, fmtKm, fmtTime, isPast, priceLabel, walkMin, relTime, STATUS_LABEL, timeLabel } from '../lib/logic';
 import { useDistance } from '../components/events';
 import { Avatar, AvatarStack, Empty, Media, Seg, Sheet, Stars, TopBar } from '../components/ui';
 import { Icon } from '../components/Icon';
@@ -30,7 +30,7 @@ const pinIcon = L.divIcon({ className: '', html: '<div class="pin active">📍</
 export function EventDetail() {
   const { id = '' } = useParams();
   const nav = useNavigate();
-  const { s, eventById, person, setStatus, toggleFollow, answerCall, toast, rate } = useStore();
+  const { s, events, feed, eventById, person, setStatus, toggleFollow, answerCall, toast, rate } = useStore();
   const dist = useDistance();
   const [more, setMore] = useState(false);
   const [replyTo, setReplyTo] = useState<string | null>(null);
@@ -45,6 +45,9 @@ export function EventDetail() {
   const km = dist(e);
   const st = s.statuses[e.id];
   const past = isPast(e);
+  const cancelled = e.status === 'cancelled';
+  const source = feed.sources.find((x) => x.id === e.source);
+  const otherDates = e.seriesId ? events.filter((x) => x.seriesId === e.seriesId && x.id !== e.id && !isPast(x)).sort((a, b) => a.start.localeCompare(b.start)) : [];
   const fav = st === 'envie';
   const calls = s.calls.filter((x) => x.eventId === e.id && x.authorId !== 'me' && !s.visibility.blocked.includes(x.authorId));
   const myCall = s.calls.find((x) => x.eventId === e.id && x.authorId === 'me');
@@ -100,10 +103,24 @@ export function EventDetail() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }} className="mt-16">
             <Info icon="📅" label="Date" value={fmtDayLong(e.start)} />
-            <Info icon="🕐" label="Horaire" value={`${fmtTime(e.start)} – ${fmtTime(e.end)}`} />
+            <Info icon="🕐" label="Horaire" value={e.allDay ? 'Toute la journée' : `${fmtTime(e.start)} – ${fmtTime(e.end)}`} />
             <Info icon="📍" label="Lieu" value={v.name} />
             <Info icon="🚶" label="Distance" value={`${fmtKm(km)} · ${walkMin(km)} min`} />
           </div>
+
+          {e.status && (
+            <div className={`banner ${cancelled ? 'coral' : 'amber'} mt-16`} role="status">
+              <span>{cancelled ? '🚫' : e.status === 'full' ? '🎟️' : '📆'}</span>
+              <div><b>{STATUS_LABEL[e.status]}</b>{cancelled ? ' — cet event n’aura pas lieu.' : e.status === 'full' ? ' — plus de places disponibles.' : ' — vérifie la nouvelle date sur la fiche officielle.'}</div>
+            </div>
+          )}
+
+          {e.priceText && (
+            <div className="card row mt-12" style={{ padding: 12, alignItems: 'flex-start' }}>
+              <span style={{ fontSize: 18 }}>💶</span>
+              <div className="grow"><div className="eyebrow muted" style={{ fontSize: 9.5 }}>Tarifs</div><div className="small" style={{ lineHeight: 1.45 }}>{e.priceText}</div></div>
+            </div>
+          )}
 
           {past && (
             <div className="card mt-16" style={{ padding: 16 }}>
@@ -125,9 +142,10 @@ export function EventDetail() {
               <AvatarStack ids={e.attendees} size={34} max={4} extra={Math.max(0, e.attendeeCount - e.attendees.length)} />
             </div>
             <div>
-              <b style={{ fontSize: 14 }}>{total} personne{total > 1 ? 's' : ''} y {total > 1 ? 'vont' : 'va'}</b>
+              <b style={{ fontSize: 14 }}>{total ? `${total} membre${total > 1 ? 's' : ''} Buddy y ${total > 1 ? 'vont' : 'va'}` : 'Sois le premier à y aller'}</b>
               <div className="tiny muted">
                 {buddies.length ? <>dont <span className="coral" style={{ fontWeight: 700 }}>{buddies.length} {buddies.length > 1 ? 'Buddies' : 'Buddy'}</span> — {buddies.map((b) => person(b).name).join(', ')}</> : 'Aucun de tes Buddies pour l’instant'}
+                <div style={{ marginTop: 2 }}>Membres de la communauté de démonstration</div>
               </div>
             </div>
           </Link>
@@ -176,6 +194,7 @@ export function EventDetail() {
           <div className="row wrap gap-8 mt-16">
             {e.pmr ? <span className="tag green">♿ Accessible PMR</span> : <span className="tag gray">Accès PMR non garanti</span>}
             {e.price === 0 && <span className="tag green">Entrée libre</span>}
+            {e.kids && <span className="tag purple">👧 Enfants bienvenus</span>}
             {e.capacity && <span className="tag gray">Jauge {e.capacity}</span>}
           </div>
 
@@ -194,6 +213,27 @@ export function EventDetail() {
             </div>
           </div>
 
+          {otherDates.length > 0 && (
+            <>
+              <div className="divider" />
+              <h2 className="title-m">Autres dates · {otherDates.length}</h2>
+              <div className="row wrap gap-8 mt-12">
+                {otherDates.slice(0, 8).map((d) => (
+                  <Link key={d.id} to={`/event/${d.id}`} replace className="chip" style={{ height: 34 }}>{fmtDayShort(d.start)} · {timeLabel(d)}</Link>
+                ))}
+                {otherDates.length > 8 && <span className="chip" style={{ height: 34, opacity: 0.7 }}>+ {otherDates.length - 8}</span>}
+              </div>
+            </>
+          )}
+
+          {e.source && (
+            <div className="card mt-16" style={{ padding: 14 }}>
+              <div className="small"><b>Source :</b> {source?.name ?? e.organizer}{source ? ` · ${source.license}` : ''}</div>
+              <div className="tiny muted mt-4">Publié par {e.organizer}{source?.updatedAt ? ` · données mises à jour ${relTime(source.updatedAt)}` : ''}. Vérifie les infos avant de te déplacer.</div>
+              {e.sourceUrl && <a className="link mt-8" style={{ display: 'inline-block' }} href={e.sourceUrl} target="_blank" rel="noreferrer">Voir la fiche officielle ↗</a>}
+            </div>
+          )}
+
           <div className="row gap-8 mt-16">
             <button className="btn btn-md btn-ghost grow" onClick={() => downloadIcs(e)}><Icon name="calendar" size={16} /> Ajouter à mon calendrier</button>
           </div>
@@ -201,7 +241,10 @@ export function EventDetail() {
         </div>
       </div>
 
-      {!past && (
+      {!past && cancelled && (
+        <div className="cta-bar"><div className="btn btn-block btn-ghost" style={{ pointerEvents: 'none' }}>🚫 Event annulé</div></div>
+      )}
+      {!past && !cancelled && (
         <div className="cta-bar">
           <button className="btn btn-ghost" style={{ width: 52, padding: 0, color: fav ? 'var(--coral)' : undefined }} aria-label="Envie" aria-pressed={fav} onClick={() => setStatus(e.id, fav ? null : 'envie')}>
             <Icon name="heart" fill={fav ? 'currentColor' : 'none'} />
@@ -298,6 +341,7 @@ export function Participants() {
           {!list.length && <div className="list-item muted small">Personne dans cette catégorie pour l’instant.</div>}
         </div>
         {tab === 'all' && hidden > 0 && <p className="tiny muted mt-12" style={{ textAlign: 'center' }}>+ {hidden} participant{hidden > 1 ? 's' : ''} qui ont choisi de ne pas apparaître 🔒</p>}
+        <p className="tiny muted mt-12" style={{ textAlign: 'center' }}>Les membres affichés font partie de la communauté de démonstration de Buddy.</p>
       </div>
     </div>
   );

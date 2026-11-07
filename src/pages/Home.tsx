@@ -5,31 +5,34 @@ import { CATEGORIES, CITIES, catById, venueById } from '../data/catalog';
 import { Avatar, Media, Sheet } from '../components/ui';
 import { Poster, useDistance } from '../components/events';
 import { Icon } from '../components/Icon';
-import { dayDiff, fmtKm, fmtTime, fmtToday, inDateRange, isPast, priceLabel, DEFAULT_FILTERS } from '../lib/logic';
+import { collapseSeries, dayDiff, fmtKm, fmtToday, inDateRange, isPast, priceLabel, timeLabel, DEFAULT_FILTERS } from '../lib/logic';
+import { FeedState } from '../components/FeedState';
 import type { EventItem } from '../data/types';
 
 export function Home() {
-  const { s, events, person, setStatus, setFilters, updateUser } = useStore();
+  const { s, events, feed, person, setStatus, setFilters, updateUser } = useStore();
   const nav = useNavigate();
   const dist = useDistance();
   const [menu, setMenu] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
 
   const upcoming = useMemo(
-    () => events.filter((e) => !isPast(e)).sort((a, b) => +new Date(a.start) - +new Date(b.start)),
+    () => events.filter((e) => !isPast(e) && e.status !== 'cancelled').sort((a, b) => +new Date(a.start) - +new Date(b.start)),
     [events],
   );
+  // une seule entrée par événement récurrent (une expo quotidienne ne remplit pas une rubrique)
+  const unique = useMemo(() => collapseSeries(upcoming).map((x) => x.e), [upcoming]);
   const score = (e: EventItem) => (s.user.interests.includes(e.category) ? 10 : 0) - dist(e) + e.attendees.filter((a) => s.buddies.includes(a)).length * 2;
 
-  const tonight = upcoming.filter((e) => dayDiff(new Date(e.start)) === 0);
-  const hero = [...(tonight.length ? tonight : upcoming.slice(0, 5))].sort((a, b) => score(b) - score(a))[0];
-  const week = upcoming.filter((e) => dayDiff(new Date(e.start)) < 7 && e.id !== hero?.id).sort((a, b) => score(b) - score(a));
+  const tonight = unique.filter((e) => dayDiff(new Date(e.start)) === 0 && !e.allDay && new Date(e.start).getTime() > Date.now());
+  const hero = [...(tonight.length ? tonight : unique.slice(0, 30))].sort((a, b) => score(b) - score(a))[0];
+  const week = unique.filter((e) => dayDiff(new Date(e.start)) < 7 && e.id !== hero?.id).sort((a, b) => score(b) - score(a));
   const mine = upcoming.filter((e) => s.statuses[e.id] === 'going');
-  const buddyEvents = upcoming
+  const buddyEvents = unique
     .map((e) => ({ e, b: e.attendees.find((a) => s.buddies.includes(a)) }))
     .filter((x): x is { e: EventItem; b: string } => !!x.b)
     .slice(0, 6);
-  const freeWeekend = upcoming.filter((e) => e.price === 0 && inDateRange(e, 'weekend'));
+  const freeWeekend = unique.filter((e) => e.price === 0 && inDateRange(e, 'weekend')).sort((a, b) => score(b) - score(a));
   const calls = s.calls.filter((c) => c.authorId !== 'me' && upcoming.some((e) => e.id === c.eventId)).slice(0, 4);
   const unreadNotifs = s.notifications.filter((n) => !n.read).length;
   const st = hero ? s.statuses[hero.id] : undefined;
@@ -64,7 +67,7 @@ export function Home() {
               <div style={{ position: 'absolute', inset: 0, zIndex: 2, padding: 18, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', color: '#fff' }}>
                 <span className="tag solid" style={{ alignSelf: 'flex-start', textTransform: 'none', fontSize: 12, letterSpacing: 0 }}>🔥 Coup de cœur {tonight.length ? 'ce soir' : 'du moment'}</span>
                 <h2 className="mt-8" style={{ fontSize: 21, lineHeight: 1.2 }}>{hero.title}</h2>
-                <div className="small mt-4" style={{ opacity: 0.85 }}>{fmtTime(hero.start)} · {venueById(hero.venueId).name} · {fmtKm(dist(hero))} · {priceLabel(hero.price)}</div>
+                <div className="small mt-4" style={{ opacity: 0.85 }}>{timeLabel(hero)} · {venueById(hero.venueId).name} · {fmtKm(dist(hero))} · {priceLabel(hero.price)}</div>
                 <div className="row mt-12" onClick={(ev) => ev.preventDefault()}>
                   <button className={`btn btn-md ${st === 'going' ? 'btn-success' : 'btn-white'}`} onClick={() => setStatus(hero.id, st === 'going' ? null : 'going')}>{st === 'going' ? '✓ Tu y vas' : 'J’y vais'}</button>
                   <button className="btn btn-md btn-glass" onClick={() => nav(`/event/${hero.id}/appel`)}>👋 Qui vient ?</button>
@@ -74,6 +77,8 @@ export function Home() {
           </Link>
         )}
       </div>
+
+      {feed.status !== 'ready' && <div className="pad"><FeedState credit={false} /></div>}
 
       <Row title="Que faire cette semaine ?" to="/explorer" onAll={() => setFilters({ ...DEFAULT_FILTERS, date: 'week' })}>
         {week.slice(0, 8).map((e) => <Poster key={e.id} e={e} />)}
@@ -124,7 +129,7 @@ export function Home() {
                 <div className="grow">
                   <div className="small"><b>{person(b).name}</b> <span className="muted">va à</span></div>
                   <div className="title-s ellipsis" style={{ fontSize: 14 }}>{e.title}</div>
-                  <div className="tiny muted">{fmtTime(e.start)} · {venueById(e.venueId).name} · {fmtKm(dist(e))}</div>
+                  <div className="tiny muted">{timeLabel(e)} · {venueById(e.venueId).name} · {fmtKm(dist(e))}</div>
                 </div>
                 <span className="btn btn-sm btn-soft">{s.statuses[e.id] === 'going' ? '✓' : 'Rejoindre'}</span>
               </Link>
@@ -136,7 +141,7 @@ export function Home() {
       <div className="section-head"><h2 className="title-m">Explorer par catégorie</h2></div>
       <div className="pad" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
         {CATEGORIES.map((c) => {
-          const n = upcoming.filter((e) => e.category === c.id).length;
+          const n = unique.filter((e) => e.category === c.id).length;
           return (
             <button key={c.id} className="card" style={{ padding: '14px 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }} onClick={() => goCategory(c.id)}>
               <span style={{ fontSize: 26 }}>{c.emoji}</span>
@@ -149,7 +154,7 @@ export function Home() {
 
       {freeWeekend.length > 0 && (
         <Row title="Gratuit ce week-end" to="/explorer" onAll={() => setFilters({ ...DEFAULT_FILTERS, date: 'weekend', freeOnly: true })}>
-          {freeWeekend.map((e) => <Poster key={e.id} e={e} />)}
+          {freeWeekend.slice(0, 10).map((e) => <Poster key={e.id} e={e} />)}
         </Row>
       )}
 
@@ -163,6 +168,8 @@ export function Home() {
           <Icon name="chevron" />
         </Link>
       </div>
+
+      {feed.status === 'ready' && <div className="pad"><FeedState /></div>}
 
       <Sheet open={menu} onClose={() => setMenu(false)} label="Menu profil">
         <div className="row" style={{ marginBottom: 14 }}>
@@ -194,7 +201,7 @@ export function Home() {
         </button>
         <div className="list mt-12">
           {CITIES.map((c) => {
-            const n = c.name === 'Nantes' ? upcoming.length : 0;
+            const n = ['Nantes', 'Rezé', 'Saint-Herblain', 'Orvault', 'Saint-Sébastien-sur-Loire'].includes(c.name) ? unique.length : 0;
             return (
               <button key={c.name} className="list-item" onClick={() => { updateUser({ city: c.name, lat: c.lat, lng: c.lng }); setCityOpen(false); }}>
                 <span className="ico">📍</span><span className="grow" style={{ fontWeight: 600 }}>{c.name}</span>

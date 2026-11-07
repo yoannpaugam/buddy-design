@@ -31,6 +31,17 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         runtimeCaching: [
           {
+            // vrais événements : réseau d'abord, dernière version connue hors ligne
+            urlPattern: ({ url }) => url.pathname.endsWith('/data/events.json'),
+            handler: 'NetworkFirst',
+            options: { cacheName: 'events', networkTimeoutSeconds: 6, expiration: { maxEntries: 2 } },
+          },
+          {
+            urlPattern: /^https:\/\/img\.openagenda\.com\//,
+            handler: 'CacheFirst',
+            options: { cacheName: 'event-images', expiration: { maxEntries: 300, maxAgeSeconds: 60 * 60 * 24 * 14 } },
+          },
+          {
             urlPattern: /^https:\/\/images\.unsplash\.com\//,
             handler: 'CacheFirst',
             options: { cacheName: 'images', expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 } },

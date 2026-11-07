@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { EventItem } from '../data/types';
 import { catById, venueById } from '../data/catalog';
-import { fmtKm, fmtWhen, kmBetween, priceLabel, fmtDayShort, fmtTime } from '../lib/logic';
+import { fmtKm, fmtWhen, kmBetween, priceLabel, fmtDayShort, timeLabel, STATUS_LABEL } from '../lib/logic';
 import { useStore } from '../store/store';
 import { Avatar, AvatarStack, Media } from './ui';
 import { Icon } from './Icon';
@@ -18,14 +18,14 @@ export function Poster({ e }: { e: EventItem }) {
   return (
     <Link to={`/event/${e.id}`} className="poster" aria-label={e.title}>
       <Media event={e} className="shade ticket" emojiSize={52}>
-        <span className={`tag price ${e.price === 0 ? 'solid' : 'white'}`} style={e.price === 0 ? { background: 'var(--green)' } : undefined}>{priceLabel(e.price)}</span>
+        {e.status ? <span className="tag price solid">{STATUS_LABEL[e.status]}</span> : <span className={`tag price ${e.price === 0 ? 'solid' : 'white'}`} style={e.price === 0 ? { background: 'var(--green)' } : undefined}>{priceLabel(e.price)}</span>}
         <div className="over">
           <div className="eyebrow" style={{ opacity: 0.85, fontSize: 10 }}>{c.label}</div>
           <div className="title-s clamp2" style={{ color: '#fff', fontSize: 14.5, lineHeight: 1.2 }}>{e.title}</div>
         </div>
       </Media>
       <div className="mt-8" style={{ padding: '0 2px' }}>
-        <div className="small" style={{ fontWeight: 700 }}>{fmtDayShort(e.start)} · {fmtTime(e.start)}</div>
+        <div className="small" style={{ fontWeight: 700 }}>{fmtDayShort(e.start)} · {timeLabel(e)}</div>
         <div className="tiny muted ellipsis mt-4">📍 {venueById(e.venueId).name} · {fmtKm(dist(e))}</div>
       </div>
     </Link>
@@ -33,7 +33,7 @@ export function Poster({ e }: { e: EventItem }) {
 }
 
 /** Carte d'event en liste (Explorer) avec bandeau appel ouvert et deux CTA. */
-export function EventCard({ e }: { e: EventItem }) {
+export function EventCard({ e, more = 0 }: { e: EventItem; more?: number }) {
   const { s, setStatus, person } = useStore();
   const dist = useDistance();
   const c = catById(e.category);
@@ -46,7 +46,7 @@ export function EventCard({ e }: { e: EventItem }) {
         <Media event={e} className="shade">
           <div style={{ position: 'absolute', top: 12, left: 14, right: 14, zIndex: 2 }} className="row between">
             <span className="tag white">{c.emoji} {c.label}</span>
-            <span className="tag" style={{ background: e.price === 0 ? 'var(--green)' : 'var(--night)', color: '#fff', fontSize: 12 }}>{priceLabel(e.price)}</span>
+            {e.status ? <span className="tag solid" style={{ fontSize: 12 }}>{STATUS_LABEL[e.status]}</span> : <span className="tag" style={{ background: e.price === 0 ? 'var(--green)' : 'var(--night)', color: '#fff', fontSize: 12 }}>{priceLabel(e.price)}</span>}
           </div>
           <div style={{ position: 'absolute', left: 16, right: 16, bottom: 12, zIndex: 2, color: '#fff' }}>
             <h3 style={{ fontSize: 18, lineHeight: 1.2 }}>{e.title}</h3>
@@ -58,11 +58,12 @@ export function EventCard({ e }: { e: EventItem }) {
           <span>🕐 {fmtWhen(e)}</span><span>·</span><span>📍 {venueById(e.venueId).name}</span><span>·</span><span>{fmtKm(dist(e))}</span>
           {e.pmr && <span title="Accessible PMR">· ♿</span>}
         </div>
-        {(buddiesGoing.length > 0 || e.attendeeCount > 0) && (
+        {more > 0 && <div className="tiny mt-4" style={{ color: 'var(--purple)', fontWeight: 600 }}>📅 + {more} autre{more > 1 ? 's' : ''} date{more > 1 ? 's' : ''}</div>}
+        {e.attendeeCount > 0 && (
           <div className="row mt-12 gap-8">
             <AvatarStack ids={e.attendees} size={24} max={3} />
             <span className="small muted">
-              <b style={{ color: 'var(--text)' }}>{e.attendeeCount} y vont</b>
+              <b style={{ color: 'var(--text)' }}>{e.attendeeCount} membre{e.attendeeCount > 1 ? 's' : ''} y {e.attendeeCount > 1 ? 'vont' : 'va'}</b>
               {buddiesGoing.length > 0 && <> · dont <span className="coral" style={{ fontWeight: 600 }}>{buddiesGoing.map((b) => person(b).name).join(', ')}</span></>}
             </span>
           </div>

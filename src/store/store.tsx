@@ -1,12 +1,21 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type {
-  Call, Conversation, EventItem, EventStatus, Filters, Group, Message, Notification, Person, UserProfile,
+  Call, Conversation, DataSource, EventFeed, EventItem, EventStatus, Filters, Group, Message, Notification, Person, UserProfile,
 } from '../data/types';
-import { buildEvents, personById, PEOPLE } from '../data/catalog';
-import { emptyState, socialSeed, STATE_VERSION, type AppState } from './seed';
+import { personById, PEOPLE, registerVenues } from '../data/catalog';
+import { emptyState, STATE_VERSION, type AppState } from './seed';
+import { buildSocialSeed, withCommunity } from './community';
 import { uid } from '../lib/logic';
 
-const KEY = 'buddy:state:v1';
+const KEY = 'buddy:state:v2';
+const FEED_URL = './data/events.json';
+
+export interface FeedInfo {
+  status: 'loading' | 'ready' | 'error';
+  generatedAt?: string;
+  sources: DataSource[];
+  stale?: boolean;
+}
 
 function load(): AppState {
   try {
@@ -51,6 +60,8 @@ export interface Toast { id: string; text: string }
 
 interface Store {
   s: AppState;
+  feed: FeedInfo;
+  reloadFeed: () => void;
   events: EventItem[];
   eventById: (id: string) => EventItem | undefined;
   person: (id: string) => Person;
@@ -109,7 +120,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     timers.current.push(window.setTimeout(fn, ms));
   };
 
-  const events = useMemo(() => [...buildEvents(), ...s.customEvents], [s.customEvents]);
+  // ---- Vrais événements : fichier produit par scripts/ingest (mis à jour toutes les 6 h)
+  const [remote, setRemote] = useState<EventItem[]>([]);
+  const [feed, setFeed] = useState<FeedInfo>({ status: 'loading', sources: [] });
+  const loadFeed = useCallback(() => {
+    setFeed((f) => ({ ...f, status: 'loading' }));
+    fetch(FEED_URL, { cache: 'no-cache' })
+      .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json() as Promise<EventFeed>; })
+      .then((data) => {
+        registerVenues(data.venues ?? []);
+        setRemote(data.events ?? []);
+        setFeed({ status: 'ready', generatedAt: data.generatedAt, sources: data.sources ?? [], stale: data.stale });
+      })
+      .catch(() => setFeed((f) => ({ ...f, status: 'error' })));
+  }, []);
+  useEffect(loadFeed, [loadFeed]);
+
+  const events = useMemo(() => withCommunity([...remote, ...s.customEvents], s.companions), [remote, s.customEvents, s.companions]);
+
+  // Vie sociale de démo : générée une fois, quand les vrais events sont là
+  useEffect(() => {
+    if (!s.onboarded || s.seeded || feed.status !== 'ready' || !remote.length) return;
+    setS((st) => (st.seeded ? st : { ...st, ...buildSocialSeed(remote, st.user.interests), seeded: true }));
+  }, [s.onboarded, s.seeded, feed.status, remote]);
   const eventById = useCallback((id: string) => events.find((e) => e.id === id), [events]);
 
   const toast = useCallback((text: string) => {
@@ -137,13 +170,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }));
 
   const store: Store = {
-    s, events, eventById, person: personById, toasts, toast,
+    s, feed, reloadFeed: loadFeed, events, eventById, person: personById, toasts, toast,
 
     completeOnboarding: (u) =>
-      setS((st) => {
-        const seed = socialSeed();
-        return { ...st, ...seed, onboarded: true, user: { ...st.user, ...u, memberSince: now() } };
-      }),
+      setS((st) => ({ ...st, onboarded: true, seeded: false, user: { ...st.user, ...u, memberSince: now() } })),
     updateUser: (u) => setS((st) => ({ ...st, user: { ...st.user, ...u } })),
     setVisibility: (v) => setS((st) => ({ ...st, visibility: { ...st.visibility, ...v } })),
     setSettings: (v) => setS((st) => ({ ...st, settings: { ...st.settings, ...v } })),
@@ -170,7 +200,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const id = 'mine-' + uid();
       setS((st) => ({
         ...st,
-        customEvents: [...st.customEvents, { ...e, id, attendees: [], attendeeCount: 0, createdByMe: true }],
+        customEvents: [...st.customEvents, { ...e, id, seriesId: id, attendees: [], attendeeCount: 0, createdByMe: true }],
         statuses: { ...st.statuses, [id]: 'going' },
       }));
       toast('Ton event est publié 🎉');

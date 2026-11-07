@@ -7,7 +7,10 @@ export type CategoryId =
   | 'sport'
   | 'danse'
   | 'atelier'
-  | 'patrimoine';
+  | 'patrimoine'
+  | 'cinema'
+  | 'rencontre'
+  | 'fete';
 
 export interface Category {
   id: CategoryId;
@@ -34,8 +37,10 @@ export interface EventItem {
   /** ISO date-time de fin */
   end: string;
   venueId: string;
-  /** en euros, 0 = gratuit */
-  price: number;
+  /** en euros, 0 = gratuit, null = payant (montant non communiqué) */
+  price: number | null;
+  /** texte d'origine sur les tarifs */
+  priceText?: string;
   pmr: boolean;
   image?: string;
   description: string;
@@ -46,6 +51,35 @@ export interface EventItem {
   attendeeCount: number;
   /** créé par l'utilisateur via "Proposer un event" */
   createdByMe?: boolean;
+  /** identifiant commun aux différentes dates d'un même événement */
+  seriesId?: string;
+  /** pas d'horaire précis : toute la journée */
+  allDay?: boolean;
+  status?: 'cancelled' | 'postponed' | 'full';
+  /** adapté aux enfants de moins de 12 ans */
+  kids?: boolean;
+  /** source des données (voir DataSource) */
+  source?: string;
+  sourceUrl?: string;
+}
+
+export interface DataSource {
+  id: string;
+  name: string;
+  url: string;
+  license: string;
+  updatedAt: string | null;
+  count: number;
+}
+
+/** Fichier public/data/events.json produit par scripts/ingest/run.mjs */
+export interface EventFeed {
+  generatedAt: string;
+  window: { from: string; to: string };
+  sources: DataSource[];
+  venues: Venue[];
+  events: EventItem[];
+  stale?: boolean;
 }
 
 export interface Person {
