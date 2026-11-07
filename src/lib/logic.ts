@@ -53,6 +53,7 @@ export const monthLabel = (d: Date) => `${cap(MONTHS[d.getMonth()])} ${d.getFull
 
 export function fmtWhen(e: EventItem, ref = new Date()): string {
   const diff = dayDiff(new Date(e.start), ref);
+  if (e.allDay) return `${fmtDayShort(e.start, ref)} · toute la journée`;
   const t = fmtTime(e.start);
   if (diff === 0) return `${new Date(e.start).getHours() < 18 ? "Aujourd'hui" : 'Ce soir'} · ${t}`;
   return `${fmtDayShort(e.start, ref)} · ${t}`;
@@ -88,8 +89,28 @@ export function chatTime(iso: string, ref = new Date()): string {
   return `${d.getDate()}/${d.getMonth() + 1}`;
 }
 
-export const priceLabel = (p: number) => (p === 0 ? 'Gratuit' : `${String(p).replace('.', ',')} €`);
+export const priceLabel = (p: number | null) => (p === null ? 'Payant' : p === 0 ? 'Gratuit' : `${String(p).replace('.', ',')} €`);
 export const isPast = (e: EventItem, ref = new Date()) => new Date(e.end).getTime() < ref.getTime();
+export const timeLabel = (e: EventItem) => (e.allDay ? 'Journée' : fmtTime(e.start));
+
+/** Garde la première date de chaque événement récurrent ; `more` = nombre d'autres dates. */
+export function collapseSeries(events: EventItem[]): { e: EventItem; more: number }[] {
+  const index = new Map<string, { e: EventItem; more: number }>();
+  const out: { e: EventItem; more: number }[] = [];
+  for (const e of events) {
+    const k = e.seriesId ?? e.id;
+    const hit = index.get(k);
+    if (hit) hit.more++;
+    else { const item = { e, more: 0 }; index.set(k, item); out.push(item); }
+  }
+  return out;
+}
+
+export const STATUS_LABEL: Record<NonNullable<EventItem['status']>, string> = {
+  cancelled: 'Annulé',
+  postponed: 'Reporté',
+  full: 'Complet',
+};
 
 // ---------- Filtres ----------
 export const DEFAULT_FILTERS: Filters = {
@@ -128,6 +149,7 @@ export function matches(
   ref = new Date(),
 ): boolean {
   if (isPast(e, ref)) return false;
+  if (e.status === 'cancelled') return false;
   if (!inDateRange(e, f.date, ref)) return false;
   const h = new Date(e.start).getHours();
   if (f.hourFrom > 0 || f.hourTo < 24) {
@@ -136,8 +158,9 @@ export function matches(
   }
   const km = kmBetween(user, venueById(e.venueId));
   if (km > f.maxKm) return false;
-  if (f.freeOnly && e.price > 0) return false;
-  if (!f.freeOnly && e.price > f.maxPrice) return false;
+  if (f.freeOnly && e.price !== 0) return false;
+  // prix inconnu : exclu seulement quand un plafond est fixé
+  if (!f.freeOnly && f.maxPrice < 100 && (e.price === null || e.price > f.maxPrice)) return false;
   if (f.categories.length && !f.categories.includes(e.category)) return false;
   if (f.pmr && !e.pmr) return false;
   if (f.query.trim()) {

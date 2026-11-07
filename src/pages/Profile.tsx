@@ -220,7 +220,7 @@ export function SettingsPage() {
           <button className="list-item" onClick={() => toast('Export prêt : tes données restent sur cet appareil 📦')}><span className="ico">📦</span><span className="grow">Exporter mes données</span></button>
           <button className="list-item" style={{ color: 'var(--coral)' }} onClick={() => setConfirm(true)}><span className="ico">🔄</span><span className="grow">Réinitialiser l’app</span></button>
         </div>
-        <p className="tiny muted mt-24" style={{ textAlign: 'center', marginBottom: 30 }}>Buddy · version 0.1 (démo) · Données stockées sur cet appareil</p>
+        <p className="tiny muted mt-24" style={{ textAlign: 'center', marginBottom: 30 }}>Buddy · version 0.2 · Events : open data Nantes Métropole · Ton profil reste sur cet appareil</p>
       </div>
       <Sheet open={confirm} onClose={() => setConfirm(false)} label="Réinitialiser">
         <h2 className="title-m">Tout réinitialiser ?</h2>
@@ -238,6 +238,7 @@ const FAQ = [
   ['Ma position est-elle partagée ?', 'Non. Les autres voient seulement une distance approximative (« 2 km de toi »). Ta position sert uniquement à calculer les distances sur ton téléphone.'],
   ['Comment publier un event ?', 'Menu profil → Proposer un event, ou le bouton « Publier » dans Explorer. C’est gratuit pour les bars, associations et particuliers.'],
   ['Je ne me sens pas en sécurité avec quelqu’un', 'Depuis son profil : Masquer ou Signaler. La personne ne verra plus tes events ni tes appels. Pour une première rencontre, retrouvez-vous toujours dans un lieu public.'],
+  ['D’où viennent les événements ?', 'De l’agenda officiel de Nantes Métropole et de celui des bibliothèques de Nantes, publiés en open data (Licence Ouverte 2.0) et mis à jour automatiquement toutes les 6 heures. Chaque fiche renvoie vers la page officielle : vérifie les infos avant de te déplacer. Les membres et les conversations de cette version sont, eux, une communauté de démonstration.'],
   ['Mes données sont-elles en ligne ?', 'Dans cette version de démonstration, tout reste sur ton appareil. La version connectée chiffrera les échanges et te permettra de supprimer ton compte à tout moment.'],
 ];
 

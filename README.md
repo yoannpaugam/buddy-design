@@ -4,7 +4,9 @@
 
 Buddy est une app de sorties : elle rassemble les événements près de chez toi, même les petits (impro dans un bar, vente de plantes, tournoi de pétanque), et t'aide à trouver quelqu'un pour y aller avec toi.
 
-Cette version est une **app web mobile** (PWA) : elle s'ouvre dans le navigateur du téléphone et s'installe sur l'écran d'accueil comme une vraie app. Les données sont de démonstration (Nantes) et restent stockées sur l'appareil.
+Cette version est une **app web mobile** (PWA) : elle s'ouvre dans le navigateur du téléphone et s'installe sur l'écran d'accueil comme une vraie app.
+
+**Les événements sont réels** : environ 2 700 dates à Nantes et dans la métropole, issues de l'[agenda officiel de Nantes Métropole](https://data.nantesmetropole.fr/explore/dataset/244400404_agenda-evenements-nantes-metropole_v2/) et de l'[agenda des bibliothèques de Nantes](https://data.nantesmetropole.fr/explore/dataset/244400404_agenda-animations-culturelles-bibliotheque-municipale-nantes/) (open data, Licence Ouverte 2.0), mis à jour automatiquement toutes les 6 heures. Les membres, appels et conversations restent une communauté de démonstration ; le profil de l'utilisateur est stocké sur son appareil.
 
 ## Ce que fait l'app
 
@@ -27,7 +29,8 @@ Cette version est une **app web mobile** (PWA) : elle s'ouvre dans le navigateur
 ```bash
 npm install
 npm run dev       # http://localhost:5173
-npm test          # tests de la logique de recherche
+npm test          # tests de la logique de recherche et de la collecte
+npm run ingest    # récupère les vrais événements dans public/data/events.json
 npm run build     # version de production dans dist/
 ```
 
@@ -43,7 +46,9 @@ L'app sera alors accessible sur `https://yoannpaugam.github.io/buddy-design/`.
 - PWA (vite-plugin-pwa) : installable, fonctionne hors ligne après la première visite
 - Carte : Leaflet + tuiles OpenStreetMap / CARTO
 - État de l'app : `src/store/` (persisté dans le navigateur). Les réponses des autres membres sont simulées pour la démo.
-- Données : `src/data/catalog.ts` (lieux, events, personnes). Les dates sont calculées à partir du jour courant.
+- Collecte : `scripts/ingest/` — export JSON de l'API Opendatasoft de Nantes Métropole (sans clé), conversion vers le modèle de l'app (heure de Paris, prix, accessibilité PMR, statut annulé/complet/reporté, 12 catégories), géocodage des adresses manquantes via l'API Adresse de l'IGN, dédoublonnage entre sources, garde-fou si la collecte chute.
+- Données de l'app : `public/data/events.json` (généré, non versionné) ; communauté fictive dans `src/store/community.ts`.
+- Mise à jour planifiée : GitHub désactive les tâches planifiées d'un dépôt public après 60 jours sans activité ; un simple commit ou un « Run workflow » les relance.
 
 ### Pour passer à une vraie version multi-utilisateurs
 

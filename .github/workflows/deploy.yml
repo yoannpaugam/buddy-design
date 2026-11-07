@@ -1,8 +1,14 @@
 name: Déployer sur GitHub Pages
 
+# Publie l'app et rafraîchit les vrais événements de Nantes :
+# - à chaque push sur main,
+# - automatiquement toutes les 6 heures (collecte des agendas open data),
+# - à la demande (onglet Actions → Run workflow).
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -12,7 +18,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -25,6 +31,18 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - name: Collecter les événements (open data Nantes Métropole)
+        run: npm run ingest
+        env:
+          PREVIOUS_URL: https://yoannpaugam.github.io/buddy-design/data/events.json
+      - name: Résumé de la collecte
+        run: |
+          {
+            echo "### Collecte des événements"
+            echo '```json'
+            cat public/data/ingest-report.json | head -c 4000
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

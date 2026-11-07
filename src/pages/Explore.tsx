@@ -5,9 +5,10 @@ import L from 'leaflet';
 import { useStore } from '../store/store';
 import { CATEGORIES, catById, venueById } from '../data/catalog';
 import type { EventItem, Filters } from '../data/types';
-import { activeFilterCount, filterSummary, fmtKm, fmtTime, matches, priceLabel } from '../lib/logic';
+import { activeFilterCount, collapseSeries, filterSummary, fmtKm, matches, priceLabel, timeLabel } from '../lib/logic';
 import { EventCard, useDistance } from '../components/events';
 import { Empty, Media } from '../components/ui';
+import { FeedState } from '../components/FeedState';
 import { Icon } from '../components/Icon';
 
 const DATES: { id: Filters['date']; label: string }[] = [
@@ -61,9 +62,15 @@ export function Explore() {
   return view === 'map' ? <MapView onList={() => setParams({})} /> : <ListView onMap={() => setParams({ vue: 'carte' })} />;
 }
 
+const PAGE = 25;
+
 function ListView({ onMap }: { onMap: () => void }) {
-  const { s, setFilters, saveAlert } = useStore();
+  const { s, setFilters, saveAlert, feed } = useStore();
+  const feedReady = feed.status === 'ready';
   const results = useResults();
+  const grouped = useMemo(() => collapseSeries(results), [results]);
+  const [shown, setShown] = useState(PAGE);
+  useEffect(() => setShown(PAGE), [s.filters]);
   const toggleCat = (id: EventItem['category']) =>
     setFilters({ categories: s.filters.categories.includes(id) ? s.filters.categories.filter((c) => c !== id) : [...s.filters.categories, id] });
   const n = activeFilterCount(s.filters);
@@ -87,7 +94,7 @@ function ListView({ onMap }: { onMap: () => void }) {
 
       <div className="pad mt-12">
         <div className="row between">
-          <div className="small muted"><b style={{ color: 'var(--text)' }}>{results.length} event{results.length > 1 ? 's' : ''}</b> · {filterSummary(s.filters)}</div>
+          <div className="small muted"><b style={{ color: 'var(--text)' }}>{grouped.length} event{grouped.length > 1 ? 's' : ''}</b>{results.length > grouped.length ? ` (${results.length} dates)` : ''} · {filterSummary(s.filters)}</div>
         </div>
         {n > 0 && (
           <div className="row gap-8 mt-8">
@@ -96,9 +103,13 @@ function ListView({ onMap }: { onMap: () => void }) {
             <button className="link" style={{ color: 'var(--muted)' }} onClick={() => setFilters({ date: 'all', hourFrom: 0, hourTo: 24, maxKm: 30, freeOnly: false, maxPrice: 100, categories: [], pmr: false, query: '' })}>Tout effacer</button>
           </div>
         )}
+        <FeedState />
         <div className="col gap-14 mt-16">
-          {results.map((e) => <EventCard key={e.id} e={e} />)}
-          {!results.length && (
+          {grouped.slice(0, shown).map(({ e, more }) => <EventCard key={e.id} e={e} more={more} />)}
+          {grouped.length > shown && (
+            <button className="btn btn-ghost btn-block" onClick={() => setShown((n) => n + PAGE)}>Voir plus d’events ({grouped.length - shown} restants)</button>
+          )}
+          {!results.length && feedReady && (
             <Empty emoji="🔭" title="Aucun event avec ces critères" text="Élargis la distance, change de date ou retire un filtre."
               action={<Link to="/filtres" className="btn btn-md btn-dark">Modifier les filtres</Link>} />
           )}
@@ -113,9 +124,11 @@ function ListView({ onMap }: { onMap: () => void }) {
   );
 }
 
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 function pinIcon(e: EventItem, state: 'active' | 'dim' | 'normal') {
   const c = catById(e.category);
-  const label = state === 'active' ? e.title.split(' — ')[0].slice(0, 22) : priceLabel(e.price);
+  const label = state === 'active' ? esc(e.title.split(' — ')[0].slice(0, 22)) : priceLabel(e.price);
   return L.divIcon({ className: '', html: `<div class="pin ${state}"><span>${c.emoji}</span>${label}</div>`, iconSize: [0, 0] });
 }
 const meIcon = L.divIcon({ className: '', html: '<div class="me-dot"></div>', iconSize: [0, 0] });
@@ -141,8 +154,10 @@ function ZoomButtons({ center }: { center: [number, number] }) {
 
 function MapView({ onList }: { onList: () => void }) {
   const { s } = useStore();
-  const results = useResults();
+  const all = useResults();
   const dist = useDistance();
+  // une épingle par événement (première date), les 150 plus proches pour rester fluide
+  const results = useMemo(() => collapseSeries(all).map((x) => x.e).sort((a, b) => dist(a) - dist(b)).slice(0, 150), [all]); // eslint-disable-line react-hooks/exhaustive-deps
   const [active, setActive] = useState<string | undefined>(results[0]?.id);
   const strip = useRef<HTMLDivElement>(null);
   const me: [number, number] = [s.user.lat, s.user.lng];
@@ -198,7 +213,7 @@ function MapView({ onList }: { onList: () => void }) {
       <div className="map-overlay" style={{ bottom: 12 }}>
         <div className="row" style={{ justifyContent: 'flex-end', padding: '0 20px 10px' }}>
           <button className="btn btn-md btn-dark" style={{ borderRadius: 22, boxShadow: 'var(--shadow-lg)' }} onClick={onList}>
-            <Icon name="list" size={17} /> {results.length} évènement{results.length > 1 ? 's' : ''}
+            <Icon name="list" size={17} /> {collapseSeries(all).length} évènement{all.length > 1 ? 's' : ''}
           </button>
         </div>
         <div className="hscroll" ref={strip} style={{ paddingBottom: 8 }}>
@@ -208,7 +223,7 @@ function MapView({ onList }: { onList: () => void }) {
               <div className="grow" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
                 <div className="row gap-6"><span className="tag">{catById(e.category).label}</span><b className="small" style={{ color: e.price ? 'var(--text)' : 'var(--green-dark)' }}>{priceLabel(e.price)}</b></div>
                 <div className="title-s ellipsis" style={{ fontSize: 14 }}>{e.title}</div>
-                <div className="tiny muted">🕐 {fmtTime(e.start)} · 📍 {fmtKm(dist(e))}</div>
+                <div className="tiny muted">🕐 {timeLabel(e)} · 📍 {fmtKm(dist(e))}</div>
               </div>
             </Link>
           ))}

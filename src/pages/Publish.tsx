@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/store';
-import { CATEGORIES, IMAGES, VENUES, catById } from '../data/catalog';
+import { CATEGORIES, IMAGES, allVenues, catById } from '../data/catalog';
 import type { CategoryId } from '../data/types';
 import { priceLabel } from '../lib/logic';
 import { Toggle, TopBar } from '../components/ui';
 
 const CAT_IMAGE: Partial<Record<CategoryId, string>> = {
-  theatre: IMAGES.theatre, concert: IMAGES.jazz, jeux: IMAGES.games, expo: IMAGES.expo, marche: IMAGES.plant, danse: IMAGES.dance, patrimoine: IMAGES.histo,
+  theatre: IMAGES.theatre, concert: IMAGES.jazz, cinema: IMAGES.theatre, fete: IMAGES.dance, jeux: IMAGES.games, expo: IMAGES.expo, marche: IMAGES.plant, danse: IMAGES.dance, patrimoine: IMAGES.histo,
 };
 
 const isoDate = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 export function Publish() {
+  const VENUES = allVenues();
   const { s, publishEvent } = useStore();
   const nav = useNavigate();
   const [title, setTitle] = useState('');
@@ -21,7 +22,7 @@ export function Publish() {
   const [date, setDate] = useState(isoDate(new Date(Date.now() + 86400000 * 3)));
   const [from, setFrom] = useState('19:00');
   const [to, setTo] = useState('22:00');
-  const [venueId, setVenueId] = useState(VENUES[0].id);
+  const [venueId, setVenueId] = useState(VENUES[0]?.id ?? '');
   const [free, setFree] = useState(true);
   const [price, setPrice] = useState(5);
   const [pmr, setPmr] = useState(false);
@@ -31,7 +32,7 @@ export function Publish() {
   const start = new Date(`${date}T${from}`);
   let end = new Date(`${date}T${to}`);
   if (end <= start) end = new Date(end.getTime() + 86400000);
-  const valid = title.trim().length >= 3 && organizer.trim() && description.trim().length >= 10 && !Number.isNaN(start.getTime()) && start.getTime() > Date.now();
+  const valid = !!venueId && title.trim().length >= 3 && organizer.trim() && description.trim().length >= 10 && !Number.isNaN(start.getTime()) && start.getTime() > Date.now();
 
   const submit = () => {
     const id = publishEvent({
@@ -78,7 +79,7 @@ export function Publish() {
             <select id="p-venue" className="input" value={venueId} onChange={(e) => setVenueId(e.target.value)}>
               {VENUES.map((v) => <option key={v.id} value={v.id}>{v.name} — {v.address}</option>)}
             </select>
-            <span className="tiny muted">Ton lieu n’est pas dans la liste ? L’ajout d’adresse libre arrive avec la version connectée.</span>
+            <span className="tiny muted">Les lieux viennent de l’agenda de la Métropole. Ton lieu n’y est pas ? L’adresse libre arrive avec la version connectée.</span>
           </div>
 
           <div className="card mt-16" style={{ padding: '4px 16px' }}>

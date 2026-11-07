@@ -1,0 +1,32 @@
+name: Vérifier la pull request
+
+# Avant chaque fusion : tests, collecte réelle des événements et construction de l'app.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Collecter les événements
+        run: npm run ingest
+      - name: Résumé de la collecte
+        run: |
+          {
+            echo "### Collecte des événements"
+            echo '```json'
+            head -c 4000 public/data/ingest-report.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - run: npm run build

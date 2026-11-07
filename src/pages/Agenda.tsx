@@ -70,7 +70,7 @@ function AgendaRow({ e }: { e: EventItem }) {
     <div className="card" style={{ padding: 12 }}>
       <Link to={`/event/${e.id}`} className="row">
         <div style={{ width: 52, textAlign: 'center', borderRight: '1px solid var(--line)', paddingRight: 10, flexShrink: 0 }}>
-          <div className="title-s" style={{ fontSize: 16 }}>{fmtHM(e.start)}</div>
+          <div className="title-s" style={{ fontSize: e.allDay ? 13 : 16 }}>{e.allDay ? 'Journée' : fmtHM(e.start)}</div>
           <div className="tiny muted">{fmtDayShort(e.start).replace("Aujourd'hui", "Auj.")}</div>
         </div>
         <Media event={e} style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0 }} emojiSize={20} />
