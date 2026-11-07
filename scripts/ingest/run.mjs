@@ -85,7 +85,7 @@ async function main() {
   const now = new Date();
   const from = isoDay(new Date(now.getTime() - DAYS_BACK * 86400000));
   const to = isoDay(new Date(now.getTime() + DAYS_AHEAD * 86400000));
-  const report = { startedAt: now.toISOString(), window: { from, to }, sources: [], dropped: {}, categories: {}, unmappedTypes: {} };
+  const report = { startedAt: now.toISOString(), window: { from, to }, sources: [], dropped: {}, categories: {}, unmappedTypes: {}, typeCounts: {} };
   const venues = new Map();
   const events = [];
   const sourcesMeta = [];
@@ -113,6 +113,10 @@ async function main() {
         if (!Number.isFinite(v.lat) || !Number.isFinite(v.lng)) { stat.droppedNoPlace++; continue; }
         events.push(event);
         stat.kept++;
+        {
+          const tk = `${source.id}: ${(rec.types_libelles || [rec.categorie_1, rec.categorie_2]).filter(Boolean).join(' | ') || '(aucun type)'} → ${event.category}`;
+          report.typeCounts[tk] = (report.typeCounts[tk] || 0) + 1;
+        }
         if (event.category === 'fete') {
           const k = (rec.types_libelles || [rec.categorie_1]).join(' | ') || '(aucun type)';
           report.unmappedTypes[k] = (report.unmappedTypes[k] || 0) + 1;
