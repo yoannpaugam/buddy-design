@@ -1,4 +1,4 @@
-import type { Category, CategoryId, Person, Venue } from './types';
+import type { Category, CategoryId, Person, PlaceKind, Venue } from './types';
 
 export const CATEGORIES: Category[] = [
   { id: 'concert', label: 'Concert', emoji: '🎵', color: '#2563EB' },
@@ -14,6 +14,17 @@ export const CATEGORIES: Category[] = [
   { id: 'sport', label: 'Sport', emoji: '⚽', color: '#EA580C' },
   { id: 'fete', label: 'Fête', emoji: '🎉', color: '#F59E0B' },
 ];
+
+export const PLACE_KINDS: { id: PlaceKind; label: string; plural: string; emoji: string; color: string }[] = [
+  { id: 'bar', label: 'Bar', plural: 'Bars', emoji: '🍸', color: '#E11D48' },
+  { id: 'pub', label: 'Pub', plural: 'Pubs', emoji: '🍺', color: '#B45309' },
+  { id: 'cafe', label: 'Café', plural: 'Cafés', emoji: '☕', color: '#92400E' },
+  { id: 'concert', label: 'Salle de concert', plural: 'Salles de concert', emoji: '🎸', color: '#2563EB' },
+  { id: 'club', label: 'Boîte de nuit', plural: 'Boîtes', emoji: '🪩', color: '#7C3AED' },
+  { id: 'culture', label: 'Lieu culturel', plural: 'Théâtres & cinés', emoji: '🎭', color: '#DB2777' },
+  { id: 'marche', label: 'Marché', plural: 'Marchés', emoji: '🧺', color: '#65A30D' },
+];
+export const kindById = (id: PlaceKind) => PLACE_KINDS.find((k) => k.id === id) ?? PLACE_KINDS[0];
 
 export const catById = (id: CategoryId): Category => CATEGORIES.find((c) => c.id === id) ?? CATEGORIES[0];
 

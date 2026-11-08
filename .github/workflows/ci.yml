@@ -19,8 +19,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - name: Collecter les événements
+      - name: Collecter les événements et les lieux
         run: npm run ingest
+        env:
+          OPENAGENDA_KEY: ${{ secrets.OPENAGENDA_KEY }}
+          OPENAGENDA_AGENDAS: ${{ vars.OPENAGENDA_AGENDAS }}
       - name: Résumé de la collecte
         run: |
           {

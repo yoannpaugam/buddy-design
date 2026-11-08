@@ -7,6 +7,7 @@ import { Poster, useDistance } from '../components/events';
 import { Icon } from '../components/Icon';
 import { collapseSeries, dayDiff, fmtKm, fmtToday, inDateRange, isPast, priceLabel, timeLabel, DEFAULT_FILTERS } from '../lib/logic';
 import { FeedState } from '../components/FeedState';
+import { OpenNowRow } from './Places';
 import type { EventItem } from '../data/types';
 
 export function Home() {
@@ -108,6 +109,8 @@ export function Home() {
           </div>
         </>
       )}
+
+      <OpenNowRow />
 
       <Row title="Tes évènements à venir" to="/agenda">
         {mine.length ? mine.map((e) => <Poster key={e.id} e={e} />) : (

@@ -31,10 +31,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - name: Collecter les événements (open data Nantes Métropole)
+      - name: Collecter les événements et les lieux (open data Nantes Métropole, OpenStreetMap, OpenAgenda)
         run: npm run ingest
         env:
           PREVIOUS_URL: https://yoannpaugam.github.io/buddy-design/data/events.json
+          PREVIOUS_PLACES_URL: https://yoannpaugam.github.io/buddy-design/data/places.json
+          OPENAGENDA_KEY: ${{ secrets.OPENAGENDA_KEY }}
+          OPENAGENDA_AGENDAS: ${{ vars.OPENAGENDA_AGENDAS }}
       - name: Résumé de la collecte
         run: |
           {
