@@ -64,6 +64,9 @@ export function placeFrom(el) {
   // cafés de chaînes et points de vente à emporter : peu utiles pour sortir
   // marchés de gros et AMAP (réservées aux adhérents) : pas des sorties ouvertes à tous
   if (kind === 'marche' && (t.wholesale === 'yes' || /\bamap\b|int[ée]r[êe]t national|\bMIN\b/i.test(name))) return null;
+  if (kind === 'cafe' && /^caf[eé]t(?:'|eria|ier)/i.test(name)) return null; // cafétérias (Crous, entreprises)
+  if (/crous/i.test(t.operator || '')) return null;
+  if (kind === 'culture' && /^[ée]cole\b/i.test(name)) return null;
   if (kind === 'cafe' && (t.takeaway === 'only' || /^(starbucks|columbus|paul|brioche dor[eé]e|mcdonald)/i.test(name))) return null;
   const hours = clean(t.opening_hours, 300);
   const wheel = t.wheelchair;

@@ -11,6 +11,7 @@ import { Empty, Seg, TopBar } from '../components/ui';
 import { Icon } from '../components/Icon';
 
 // ---------- Horaires ----------
+const DAYS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 const rulesCache = new Map<string, ReturnType<typeof parseOpeningHours>>();
 const rulesOf = (p: Place) => {
   if (!p.hours) return null;
@@ -22,7 +23,9 @@ export function placeStatus(p: Place, at = new Date()): { open: boolean | null; 
   const st = openState(rulesOf(p), at);
   if (!st) return { open: null, text: p.hours ? 'Voir les horaires' : 'Horaires non renseignés' };
   if (st.open) return { open: true, text: `Ouvert · jusqu’à ${fmtMinutes(st.until ?? 0)}` };
-  return { open: false, text: st.opensAt != null ? `Fermé · ouvre à ${fmtMinutes(st.opensAt)}` : 'Fermé aujourd’hui' };
+  if (st.opensAt == null) return { open: false, text: 'Fermé' };
+  const when = !st.inDays ? '' : st.inDays === 1 ? 'demain ' : `${DAYS_FR[st.weekday ?? 0]} `;
+  return { open: false, text: `Fermé · ouvre ${when}à ${fmtMinutes(st.opensAt)}` };
 }
 
 function StatusLine({ p, className = 'tiny' }: { p: Place; className?: string }) {

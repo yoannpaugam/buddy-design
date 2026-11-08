@@ -23,11 +23,7 @@ jobs:
         run: npm run ingest
         env:
           OPENAGENDA_KEY: ${{ secrets.OPENAGENDA_KEY }}
-      - name: TEMP rapport + sondage du catalogue Nantes
-        run: |
-          cat public/data/ingest-report.json | head -c 12000
-          node -e "const p=require('./public/data/places.json');const m=p.places.filter(x=>x.kind==='marche');console.log('MARCHES',m.length);for(const x of m)console.log(JSON.stringify([x.name,x.hours,x.tags]));const e=require('./public/data/events.json');console.log('EVENTS',e.events.length,'by source',JSON.stringify(e.events.reduce((a,x)=>(a[x.source]=(a[x.source]||0)+1,a),{})));console.log('BROC',e.events.filter(x=>/brocante|vide.?grenier|braderie|puces/i.test(x.title)).length)"
-          node -e "const p=require('./public/data/places.json');const r=require('./public/data/ingest-report.json');console.log('PLACES',JSON.stringify(r.places));console.log('REVERSE',r.sources.find(s=>s.id==='osm').reverse);for(const x of p.places.filter(x=>x.kind!=='marche').slice(0,400).filter((_,i)=>i%10===0))console.log('P',JSON.stringify(x));const e=require('./public/data/events.json');for(const x of e.events.filter(x=>x.source==='osm').slice(0,400).filter((_,i)=>i%8===0))console.log('M',x.title,'|',x.start,'|',e.venues.find(v=>v.id===x.venueId)?.address)"
+          OPENAGENDA_AGENDAS: ${{ vars.OPENAGENDA_AGENDAS }}
       - name: Résumé de la collecte
         run: |
           {

@@ -88,12 +88,14 @@ export function parseOpeningHours(raw) {
   const value = raw.trim();
   if (value === '24/7') return [{ times: [[0, 1440]] }];
   const rules = [];
-  for (let rule of value.split(';').map((x) => x.trim()).filter(Boolean)) {
+  // « Tu,We 17:00-24:00, Th-Sa 17:00-01:00 » : la virgule après une heure sépare aussi des règles
+  const parts = value.split(';').flatMap((x) => x.split(/(?<=\d)\s*,\s*(?=(?:mo|tu|we|th|fr|sa|su|ph)\b)/i));
+  for (let rule of parts.map((x) => x.trim()).filter(Boolean)) {
     rule = rule.replace(/"[^"]*"/g, '').trim(); // commentaires « "sur réservation" »
     if (/^ph\b/i.test(rule) || /^sh\b/i.test(rule)) continue; // jours fériés / vacances : ignorés
     const r = { times: [] };
     let rest = rule;
-    const mm = /^((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)(?:-(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))?(?:,(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)(?:-(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))?)*)\s+/i.exec(rest);
+    const mm = /^((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)(?:-(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))?(?:,(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)(?:-(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))?)*):?\s+/i.exec(rest);
     if (mm) {
       r.months = parseMonths(mm[1]);
       if (!r.months) return null;
@@ -163,7 +165,13 @@ export function openState(rules, at = new Date()) {
   for (const [a, b] of yesterday) if (b > 1440 && mins < b - 1440) return { open: true, until: b - 1440 };
   for (const [a, b] of today) if (mins >= a && mins < b) return { open: true, until: b % 1440 };
   const next = today.filter(([a]) => a > mins).sort((x, y) => x[0] - y[0])[0];
-  return { open: false, opensAt: next ? next[0] : undefined };
+  if (next) return { open: false, opensAt: next[0], inDays: 0 };
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(at.getFullYear(), at.getMonth(), at.getDate() + i);
+    const iv = intervalsOn(rules, d.getFullYear(), d.getMonth() + 1, d.getDate()).slice().sort((x, y) => x[0] - y[0]);
+    if (iv.length) return { open: false, opensAt: iv[0][0], inDays: i, weekday: d.getDay() };
+  }
+  return { open: false };
 }
 
 /** « 18h », « 1h30 » */

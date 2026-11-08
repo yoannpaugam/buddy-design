@@ -37,6 +37,7 @@ jobs:
           PREVIOUS_URL: https://yoannpaugam.github.io/buddy-design/data/events.json
           PREVIOUS_PLACES_URL: https://yoannpaugam.github.io/buddy-design/data/places.json
           OPENAGENDA_KEY: ${{ secrets.OPENAGENDA_KEY }}
+          OPENAGENDA_AGENDAS: ${{ vars.OPENAGENDA_AGENDAS }}
       - name: Résumé de la collecte
         run: |
           {

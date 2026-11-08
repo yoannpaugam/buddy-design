@@ -18,7 +18,9 @@ describe('horaires OpenStreetMap', () => {
   it('après minuit : encore ouvert le lendemain à 1 h', () => {
     const r = parseOpeningHours('Mo-Su 18:00-02:00');
     expect(openState(r, new Date(2026, 10, 10, 1, 0))).toEqual({ open: true, until: 120 });
-    expect(openState(r, new Date(2026, 10, 10, 15, 0))).toEqual({ open: false, opensAt: 1080 });
+    expect(openState(r, new Date(2026, 10, 10, 15, 0))).toEqual({ open: false, opensAt: 1080, inDays: 0 });
+    // samedi 1 h, ouvert du lundi au vendredi → lundi 8 h
+    expect(openState(parseOpeningHours('Mo-Fr 08:00-19:00'), new Date(2026, 10, 7, 3, 0))).toEqual({ open: false, opensAt: 480, inDays: 2, weekday: 1 });
   });
   it('n-ième jour du mois et mois', () => {
     const r = parseOpeningHours('Su[1] 08:00-18:00');
@@ -31,6 +33,14 @@ describe('horaires OpenStreetMap', () => {
   it('jours fériés et commentaires ignorés, 24/7 compris', () => {
     expect(parseOpeningHours('Mo-Fr 08:00-12:00,14:00-18:00; PH off')).toHaveLength(1);
     expect(intervalsOn(parseOpeningHours('24/7'), 2026, 1, 1)).toEqual([[0, 1440]]);
+  });
+  it('virgule entre règles et mois suivis de « : »', () => {
+    const r = parseOpeningHours('Tu,We 17:00-24:00, Th-Sa 17:00-01:00, Su 16:30-22:30');
+    expect(intervalsOn(r, 2026, 11, 13)).toEqual([[1020, 1500]]); // vendredi
+    expect(intervalsOn(r, 2026, 11, 15)).toEqual([[990, 1350]]); // dimanche
+    const s = parseOpeningHours('Mo 16:00-21:30; Su[-1] 15:00-20:00; Jul-Aug: Tu-Th 18:00-23:00');
+    expect(intervalsOn(s, 2026, 11, 29)).toEqual([[900, 1200]]); // dernier dimanche
+    expect(intervalsOn(s, 2026, 7, 7)).toEqual([[1080, 1380]]);
   });
   it('format inconnu → null (rien plutôt que faux)', () => {
     expect(parseOpeningHours('sunrise-sunset')).toBeNull();
@@ -129,6 +139,10 @@ describe('marchés : titres et exclusions', async () => {
   it('AMAP et marché de gros écartés', () => {
     expect(placeFrom({ ...market, tags: { ...market.tags, name: 'AMAP de la Manu' } })).toBeNull();
     expect(placeFrom({ ...market, tags: { ...market.tags, name: "Marché d'intérêt national de Nantes Métropole" } })).toBeNull();
+  });
+  it('cafétérias et écoles écartées', () => {
+    expect(placeFrom({ ...bar, tags: { amenity: 'cafe', name: "Cafet'U Droit" } })).toBeNull();
+    expect(placeFrom({ ...bar, tags: { amenity: 'arts_centre', name: 'École municipale de musique' } })).toBeNull();
   });
   it('cinéma classé en lieu culturel', () => {
     expect(placeFrom({ ...bar, tags: { amenity: 'cinema', name: 'Le Cinématographe' } })).toMatchObject({ kind: 'culture', venueType: 'Cinéma' });
