@@ -86,6 +86,25 @@ async function loadJSON(url, key) {
 }
 const loadPrevious = () => loadJSON(process.env.PREVIOUS_URL, 'events');
 
+// Adresse et commune des lieux OSM qui n'en ont pas (API Adresse de l'IGN, géocodage inverse)
+const REVERSE = 'https://data.geopf.fr/geocodage/reverse';
+async function fillAddresses(places, stat) {
+  stat.reverse = 0;
+  for (const p of places) {
+    if (p.address && p.city) continue;
+    try {
+      const j = await getJSON(`${REVERSE}?lon=${p.lng}&lat=${p.lat}&limit=1&index=address`, 2);
+      const f = j?.features?.[0]?.properties;
+      if (f && (f.distance == null || f.distance < 250)) {
+        if (!p.address && f.label) p.address = f.label;
+        if (!p.city && f.city) p.city = f.city;
+        stat.reverse++;
+      }
+    } catch { /* indisponible : on garde le lieu sans adresse */ }
+    await sleep(40);
+  }
+}
+
 // ---------- OpenStreetMap : bars, cafés, marchés… ----------
 async function collectPlaces(stat) {
   const body = new URLSearchParams({ data: overpassQuery() });
@@ -202,6 +221,7 @@ async function main() {
   const osmStat = { id: 'osm', rows: 0, places: 0, markets: 0, marketEvents: 0, marketsNoHours: 0 };
   const places = await collectPlaces(osmStat);
   osmStat.places = places.length;
+  if (!osmStat.usedPrevious) await fillAddresses(places, osmStat);
   const marketTo = isoDay(new Date(now.getTime() + Math.min(DAYS_AHEAD, 21) * 86400000));
   for (const p of places.filter((x) => x.kind === 'marche')) {
     osmStat.markets++;

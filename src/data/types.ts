@@ -210,3 +210,39 @@ export interface SavedAlert {
   label: string;
   filters: Filters;
 }
+
+// ---------- Lieux (OpenStreetMap) ----------
+export type PlaceKind = 'bar' | 'pub' | 'cafe' | 'club' | 'concert' | 'culture' | 'marche';
+
+export interface Place {
+  /** osm-n123 / osm-w123 / osm-r123 */
+  id: string;
+  name: string;
+  kind: PlaceKind;
+  lat: number;
+  lng: number;
+  address?: string;
+  city?: string;
+  /** lieux culturels : Cinéma, Théâtre, Lieu culturel */
+  venueType?: string;
+  /** horaires au format OpenStreetMap (opening_hours) */
+  hours?: string;
+  website?: string;
+  phone?: string;
+  terrace?: boolean;
+  pmr?: 'yes' | 'limited';
+  happyHours?: string;
+  craftBeer?: boolean;
+  liveMusic?: boolean;
+  sports?: boolean;
+  description?: string;
+  /** marchés : producteurs, couvert, bio, brocante */
+  tags?: string[];
+}
+
+/** Fichier public/data/places.json produit par scripts/ingest/run.mjs */
+export interface PlacesFeed {
+  generatedAt: string;
+  source: { name: string; url: string; license: string };
+  places: Place[];
+}

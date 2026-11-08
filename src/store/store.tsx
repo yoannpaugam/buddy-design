@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type {
-  Call, Conversation, DataSource, EventFeed, EventItem, EventStatus, Filters, Group, Message, Notification, Person, UserProfile,
+  Call, Conversation, DataSource, EventFeed, EventItem, EventStatus, Filters, Group, Message, Notification, Person, Place, PlacesFeed, UserProfile,
 } from '../data/types';
 import { personById, PEOPLE, registerVenues } from '../data/catalog';
 import { emptyState, STATE_VERSION, type AppState } from './seed';
@@ -9,6 +9,7 @@ import { uid } from '../lib/logic';
 
 const KEY = 'buddy:state:v2';
 const FEED_URL = './data/events.json';
+const PLACES_URL = './data/places.json';
 
 export interface FeedInfo {
   status: 'loading' | 'ready' | 'error';
@@ -63,6 +64,10 @@ interface Store {
   feed: FeedInfo;
   reloadFeed: () => void;
   events: EventItem[];
+  /** bars, cafés, marchés… (OpenStreetMap) ; vide tant que non chargé */
+  places: Place[];
+  placesStatus: 'loading' | 'ready' | 'error';
+  placeById: (id: string) => Place | undefined;
   eventById: (id: string) => EventItem | undefined;
   person: (id: string) => Person;
   toasts: Toast[];
@@ -136,6 +141,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(loadFeed, [loadFeed]);
 
+  // ---- Lieux OpenStreetMap (même rythme de mise à jour)
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [placesStatus, setPlacesStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  useEffect(() => {
+    fetch(PLACES_URL, { cache: 'no-cache' })
+      .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json() as Promise<PlacesFeed>; })
+      .then((data) => { setPlaces(data.places ?? []); setPlacesStatus('ready'); })
+      .catch(() => setPlacesStatus('error'));
+  }, []);
+  const placeIndex = useMemo(() => new Map(places.map((p) => [p.id, p])), [places]);
+  const placeById = useCallback((id: string) => placeIndex.get(id), [placeIndex]);
+
   const events = useMemo(() => withCommunity([...remote, ...s.customEvents], s.companions), [remote, s.customEvents, s.companions]);
 
   // Vie sociale de démo : générée une fois, quand les vrais events sont là
@@ -170,7 +187,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }));
 
   const store: Store = {
-    s, feed, reloadFeed: loadFeed, events, eventById, person: personById, toasts, toast,
+    s, feed, reloadFeed: loadFeed, events, places, placesStatus, placeById, eventById, person: personById, toasts, toast,
 
     completeOnboarding: (u) =>
       setS((st) => ({ ...st, onboarded: true, seeded: false, user: { ...st.user, ...u, memberSince: now() } })),

@@ -117,3 +117,20 @@ describe('OpenAgenda', () => {
     expect(u.searchParams.get('geo[northEast][lat]')).toBe('47.33');
   });
 });
+
+describe('marchés : titres et exclusions', async () => {
+  const { marketTitle } = await import('./osm.mjs');
+  it('nom générique complété par la commune', () => {
+    expect(marketTitle('Marché du bourg', 'Couëron')).toBe('Marché du bourg (Couëron)');
+    expect(marketTitle('Place du 8 mai 1945', 'Rezé')).toBe('Marché — Place du 8 mai 1945 (Rezé)');
+    expect(marketTitle('Marché de Talensac', 'Nantes')).toBe('Marché de Talensac');
+    expect(marketTitle('Wattignies', 'Nantes')).toBe('Marché — Wattignies');
+  });
+  it('AMAP et marché de gros écartés', () => {
+    expect(placeFrom({ ...market, tags: { ...market.tags, name: 'AMAP de la Manu' } })).toBeNull();
+    expect(placeFrom({ ...market, tags: { ...market.tags, name: "Marché d'intérêt national de Nantes Métropole" } })).toBeNull();
+  });
+  it('cinéma classé en lieu culturel', () => {
+    expect(placeFrom({ ...bar, tags: { amenity: 'cinema', name: 'Le Cinématographe' } })).toMatchObject({ kind: 'culture', venueType: 'Cinéma' });
+  });
+});

@@ -10,6 +10,7 @@ import { EventCard, useDistance } from '../components/events';
 import { Empty, Media } from '../components/ui';
 import { FeedState } from '../components/FeedState';
 import { Icon } from '../components/Icon';
+import { ExploreTabs, PlacesExplore } from './Places';
 
 const DATES: { id: Filters['date']; label: string }[] = [
   { id: 'all', label: 'Tout' },
@@ -58,6 +59,7 @@ function DatePills() {
 
 export function Explore() {
   const [params, setParams] = useSearchParams();
+  if (params.get('onglet') === 'lieux') return <PlacesExplore />;
   const view = params.get('vue') === 'carte' ? 'map' : 'list';
   return view === 'map' ? <MapView onList={() => setParams({})} /> : <ListView onMap={() => setParams({ vue: 'carte' })} />;
 }
@@ -83,6 +85,7 @@ function ListView({ onMap }: { onMap: () => void }) {
           <h1 className="title-xl">Explorer</h1>
           <Link to="/publier" className="btn btn-sm btn-soft"><Icon name="plus" size={16} /> Publier</Link>
         </div>
+        <div className="mt-12"><ExploreTabs /></div>
         <div className="mt-12"><SearchBar /></div>
       </div>
       <DatePills />

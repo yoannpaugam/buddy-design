@@ -25,12 +25,12 @@ export function overpassQuery(b = BBOX) {
   const box = `${b.south},${b.west},${b.north},${b.east}`;
   return `[out:json][timeout:120];
 (
-  nwr["amenity"~"^(bar|pub|biergarten|nightclub|cafe|marketplace|music_venue)$"]["name"](${box});
+  nwr["amenity"~"^(bar|pub|biergarten|nightclub|cafe|marketplace|music_venue|theatre|cinema|arts_centre)$"]["name"](${box});
 );
 out center tags;`;
 }
 
-const KIND = { bar: 'bar', biergarten: 'bar', pub: 'pub', cafe: 'cafe', nightclub: 'club', music_venue: 'concert', marketplace: 'marche' };
+const KIND = { bar: 'bar', biergarten: 'bar', pub: 'pub', cafe: 'cafe', nightclub: 'club', music_venue: 'concert', marketplace: 'marche', theatre: 'culture', cinema: 'culture', arts_centre: 'culture' };
 
 const yesNo = (v) => (v === 'yes' ? true : v === 'no' ? false : undefined);
 const clean = (s, max = 200) => (s ? String(s).replace(/\s+/g, ' ').trim().slice(0, max) : undefined);
@@ -62,6 +62,8 @@ export function placeFrom(el) {
   if (!kind || !name || !Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   if (t.disused || t['disused:amenity'] || t.access === 'private') return null;
   // cafés de chaînes et points de vente à emporter : peu utiles pour sortir
+  // marchés de gros et AMAP (réservées aux adhérents) : pas des sorties ouvertes à tous
+  if (kind === 'marche' && (t.wholesale === 'yes' || /\bamap\b|int[ée]r[êe]t national|\bMIN\b/i.test(name))) return null;
   if (kind === 'cafe' && (t.takeaway === 'only' || /^(starbucks|columbus|paul|brioche dor[eé]e|mcdonald)/i.test(name))) return null;
   const hours = clean(t.opening_hours, 300);
   const wheel = t.wheelchair;
@@ -72,6 +74,8 @@ export function placeFrom(el) {
     lat: Math.round(lat * 1e6) / 1e6,
     lng: Math.round(lng * 1e6) / 1e6,
     ...(addressOf(t) ? { address: addressOf(t) } : {}),
+    ...(t['addr:city'] ? { city: clean(t['addr:city'], 60) } : {}),
+    ...(kind === 'culture' ? { venueType: t.amenity === 'cinema' ? 'Cinéma' : t.amenity === 'theatre' ? 'Théâtre' : 'Lieu culturel' } : {}),
     ...(hours ? { hours } : {}),
     ...(website(t) ? { website: website(t) } : {}),
     ...(clean(t.phone || t['contact:phone'], 30) ? { phone: clean(t.phone || t['contact:phone'], 30) } : {}),
@@ -113,8 +117,13 @@ export function dedupePlaces(list) {
 const pad = (n) => String(n).padStart(2, '0');
 const DAY_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
-function marketTitle(name) {
-  return /^(march[eé]|halles?|les halles|foire|puces|brocante)/i.test(name) ? name : `Marché — ${name}`;
+const GENERIC = /^(place du march[eé]|march[eé] (du bourg|du dimanche|local|nocturne|biologique|bio|de producteurs|du centre|du centre-ville|hebdomadaire)|halles?|les halles|march[eé])$/i;
+
+/** Titre lisible : « Marché du bourg (Couëron) », « Marché — Wattignies ». */
+export function marketTitle(name, city) {
+  const base = /^(march[eé]|halles?|la halle|les halles|foire|puces|brocante)/i.test(name) ? name : `Marché — ${name}`;
+  const generic = GENERIC.test(name) || /^place\b/i.test(name);
+  return generic && city && !name.toLowerCase().includes(city.toLowerCase()) ? `${base} (${city})` : base;
 }
 
 /**
@@ -145,7 +154,7 @@ export function marketEvents(place, from, to) {
       events.push({
         id: `osm-m-${place.id.slice(4)}-${ymd.replace(/-/g, '')}${hm(a).replace(':', '')}`,
         seriesId: place.id,
-        title: marketTitle(place.name),
+        title: marketTitle(place.name, place.city),
         organizer: place.name,
         category: 'marche',
         start,

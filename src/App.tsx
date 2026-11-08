@@ -14,6 +14,7 @@ import { Agenda } from './pages/Agenda';
 import { Conversation, Directory, MessagesList, Requests } from './pages/Messages';
 import { BuddyProfile, BuddySearch, GroupCreate, GroupDetail, GroupSettings } from './pages/Social';
 import { Notifications } from './pages/Notifications';
+import { PlaceDetail } from './pages/Places';
 import { Faq, MyProfile, ProfileEdit, SettingsPage, VisibilityPage } from './pages/Profile';
 
 const TAB_ROUTES = ['/', '/explorer', '/agenda', '/messages'];
@@ -56,6 +57,7 @@ export function App() {
         <Route path="/event/:id/participants" element={<Participants />} />
         <Route path="/event/:id/appel" element={<CallCompose />} />
         <Route path="/appel/:id" element={<CallResponses />} />
+        <Route path="/lieu/:id" element={<PlaceDetail />} />
         <Route path="/publier" element={<Publish />} />
         <Route path="/agenda" element={<Agenda />} />
         <Route path="/messages" element={<MessagesList />} />
